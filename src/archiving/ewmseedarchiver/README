@@ -6,7 +6,30 @@ miniSEED records to the file system in flexible file layout.
 
 See the ewmseedarchiver.d file for further description of options.
 
-Open archive files are synchronized with the file system every hour by
-default.  Configure this with "FlushInterval" (seconds); set it to 0 to
-disable periodic synchronization.  Include the defining flag "%H" in an
-Archive path when separate hourly files are desired.
+Periodic archive synchronization
+--------------------------------
+
+Version 0.3.2 adds periodic synchronization of every open archive file.
+Previously, continuously active files could remain open until a stream or
+UTC-day change, so file data and file-size metadata might not become visible
+to other processes promptly.  The module now calls fsync() on Unix and
+_commit() on Windows once every hour by default.
+
+The synchronization interval is controlled with the optional FlushInterval
+command.  The value is specified in seconds:
+
+  FlushInterval 3600
+
+The default is 3600 seconds (one hour).  A value of 0 disables periodic
+synchronization.  Negative values are rejected during configuration.
+
+FlushInterval does not change the archive file name and does not split a
+daily file.  To create a separate file for every hour, include the defining
+hour flag, %H, in the Archive path.  For example on Windows:
+
+  Archive D:\data\archive\%n\%s\%Y.%j.%H.%n.%s.%l.%c.mseed
+
+With a daily Archive path and FlushInterval 3600, data continues to be
+appended to the same daily file but is synchronized at least once per hour.
+With %H in the path, a new file is selected for each hour based on the UTC
+start time in each MiniSEED record.
