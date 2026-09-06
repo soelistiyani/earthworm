@@ -32,7 +32,7 @@ jobs:
       - name: Configure MSVC
         shell: cmd
         run: |
-          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x86
+          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
           where cl
           where nmake
           cl 2>&1 | findstr /i "Version"
@@ -40,24 +40,25 @@ jobs:
       - name: Build ewmseedarchiver
         shell: cmd
         run: |
-          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x86
-
-          echo Current directory:
-          cd
-
-          echo Searching for module:
-          dir /s /b ewmseedarchiver.c
-          dir /s /b makefile.nt
-          dir /s /b ew_nt.cmd
-
-          rem SESUAIKAN dua baris berikut berdasarkan hasil Inspect repository
+          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
           call environment\ew_nt.cmd
-          cd src\archiving\ewmseedarchiver
 
-          echo Module directory:
-          cd
-          dir
+          rem ew_nt.cmd contains installation defaults. Point the build to
+          rem the GitHub Actions checkout instead.
+          set EW_HOME=D:\a\earthworm
+          set EW_VERSION=earthworm
+          set INCLUDE=%CD%\include;%CD%\include_win;%INCLUDE%
+          set LIB=%CD%\lib;%LIB%
 
+          rem Build the Earthworm objects and libraries used by this module.
+          cd src\libsrc\util
+          nmake /f makefile.nt
+          cd ..\winnt
+          nmake /f makefile.nt
+          cd ..
+          nmake /f makefile.nt %EW_HOME%\%EW_VERSION%\lib\libew_mt.lib
+
+          cd ..\archiving\ewmseedarchiver
           nmake /f makefile.nt clean
           nmake /f makefile.nt
 
@@ -73,7 +74,7 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v5
         with:
-          name: ewmseedarchiver-windows-x86
+          name: ewmseedarchiver-windows-x64
           path: |
             **/ewmseedarchiver.exe
           if-no-files-found: error
