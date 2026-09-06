@@ -1,0 +1,62 @@
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG = 1
+!ENDIF
+
+!include <Win32.Mak>
+
+CFLAGS  = $(cflags)    $(cdebug) $(cvarsmt)   $(GLOBALFLAGS) /I$E
+LDFLAGS = $(conlflags) $(ldebug) $(conlibsmt)
+
+B = $(EW_HOME)\$(EW_VERSION)\bin
+L = $(EW_HOME)\$(EW_VERSION)\lib
+E = ../export
+
+EW_LIBS = \
+	/LIBPATH:$L \
+	getsysname_ew.obj \
+	mem_circ_queue.obj \
+	swap.obj \
+	libmseed.lib \
+	libew_mt.lib
+
+all:	$B\ringdup_generic.exe \
+	$B\ringdup_scn.exe \
+	$B\tbuf2mseed.exe \
+	$B\mseed2tbuf.exe
+
+$B\ringdup_generic.exe: ringdup.obj $E\genericfilter.obj
+	$(link) /out:$@ $(LDFLAGS) ringdup.obj $E\genericfilter.obj $(EW_LIBS)
+
+$B\ringdup_scn.exe: ringdup.obj $E\scnfilter.obj
+	$(link) /out:$@ $(LDFLAGS) ringdup.obj $E\scnfilter.obj \
+		$L\rdpickcoda.obj $(EW_LIBS)
+
+$B\tbuf2mseed.exe: tbuf2mseed.obj $E\scnfilter.obj
+	$(link) /out:$@ $(LDFLAGS) tbuf2mseed.obj $E\scnfilter.obj \
+		$L\rdpickcoda.obj $(EW_LIBS)
+
+$B\mseed2tbuf.exe: mseed2tbuf.obj $E\scnfilter.obj
+	$(link) /out:$@ $(LDFLAGS) mseed2tbuf.obj $E\scnfilter.obj \
+		$L\rdpickcoda.obj $(EW_LIBS)
+
+tbuf2mseed.obj: ringdup.c
+	$(CC) $(CFLAGS) /D_TBUF2MSEED ringdup.c
+	move ringdup.obj tbuf2mseed.obj
+
+mseed2tbuf.obj: ringdup.c
+	$(CC) $(CFLAGS) /D_MSEED2TBUF ringdup.c
+	move ringdup.obj mseed2tbuf.obj
+
+
+# Clean-up rules
+clean: PHONY
+	-del a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-del $B\mseed2tbuf      $B\mseed2tbuf.exe
+	-del $B\ringdup_generic $B\ringdup_generic.exe
+	-del $B\ringdup_scn     $B\ringdup_scn.exe
+	-del $B\tbuf2mseed      $B\tbuf2mseed.exe
+
+PHONY:

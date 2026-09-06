@@ -1,0 +1,25 @@
+# The source code is here, but there is no makefile to build it; why keep it?
+
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG = 1
+!ENDIF
+
+!include <Win32.Mak>
+
+B = $(EW_HOME)\$(EW_VERSION)\bin
+L = $(EW_HOME)\$(EW_VERSION)\lib
+
+APP = wave_viewer
+
+# Copy the 2006 binary and hope it still works (32 bits only?)
+$B\$(APP).exe: Release\$(APP).exe
+	copy Release\$(APP).exe $@
+
+clean: PHONY
+	-del a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-del $B\$(APP) $B\$(APP).exe
+
+PHONY:

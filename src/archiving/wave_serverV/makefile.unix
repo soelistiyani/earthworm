@@ -1,0 +1,66 @@
+LINUX_FLAGS    = -ldl -lpthread
+SOLARIS_FLAGS  = -ldl -lnsl -lsocket -lrt -lpthread
+SPECIFIC_FLAGS = $($(PLATFORM)_FLAGS)
+
+CFLAGS = $(GLOBALFLAGS)
+
+B = $(EW_HOME)/$(EW_VERSION)/bin
+L = $(EW_HOME)/$(EW_VERSION)/lib
+
+APP = wave_serverV
+
+OBJS = \
+	$(APP).o \
+	compare.o \
+	index.o \
+	index_util.o \
+	serve_trace.o \
+	server_thread.o \
+	tb_packet_db.o
+
+EW_LIBS = \
+	$L/dirops_ew.o \
+	$L/mem_circ_queue.o \
+	$L/socket_ew.o \
+	$L/socket_ew_common.o \
+	$L/sqlite3.o \
+	$L/swap.o \
+	-L$L -lew_mt
+
+all: $B/$(APP) Tools
+
+$B/$(APP): $(OBJS)
+	$(CC) -o $@ $(CFLAGS) $(OBJS) $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+Tools: PHONY
+	@cd $@ && \
+		echo ---------- ; \
+		echo Making $@ in: `pwd` ; \
+		$(MAKE) -f makefile.unix
+
+
+# Clean-up rules
+clean:	clean/wave_serverV \
+	clean/Tools
+
+clean/wave_serverV: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+
+clean/Tools: PHONY
+	-@cd $(@F) && \
+		echo Cleaning in: `pwd` ; \
+		$(MAKE) -f makefile.unix clean
+
+clean_bin: \
+	clean_bin/wave_serverV \
+	clean_bin/Tools
+
+clean_bin/wave_serverV: PHONY
+	-$(RM) $B/$(APP) $B/$(APP).exe
+
+clean_bin/Tools: PHONY
+	-@cd $(@F) && \
+		echo Cleaning binaries in: `pwd` ; \
+		$(MAKE) -f makefile.unix clean_bin
+
+PHONY:

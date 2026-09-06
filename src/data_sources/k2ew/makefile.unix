@@ -1,0 +1,54 @@
+LINUX_FLAGS    = -lpthread
+SOLARIS_FLAGS  = -lnsl -lsocket -lrt -lpthread
+SPECIFIC_FLAGS = $($(PLATFORM)_FLAGS)
+
+CFLAGS = $(GLOBALFLAGS) -DDEBUG
+
+B = $(EW_HOME)/$(EW_VERSION)/bin
+L = $(EW_HOME)/$(EW_VERSION)/lib
+
+OBJS = \
+	k2ewmain.o \
+	error_ew_un.o \
+	getconfig.o \
+	heartbt.o \
+	k2cirbuf.o \
+	k2crctbl.o \
+	k2ewerrs.o \
+	k2ewrstrt.o \
+	k2info.o \
+	k2misc.o \
+	k2pktio.o \
+	k2pktman.o \
+	outptthrd.o \
+	terminat.o
+
+TCP_OBJS = k2c_tcp.o
+
+TTY_OBJS = k2c_ser_un.o
+
+EW_LIBS = -L$L -lew_mt
+
+EW_SOCK_LIBS = \
+	$L/socket_ew.o \
+	$L/socket_ew_common.o
+
+all: $B/k2ew_tcp $B/k2ew_tty
+
+$B/k2ew_tcp: $(OBJS) $(TCP_OBJS)
+	$(CC) -o $@ $(CFLAGS) $(OBJS) $(TCP_OBJS) \
+		$(EW_SOCK_LIBS) $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+$B/k2ew_tty: $(OBJS) $(TTY_OBJS)
+	$(CC) -o $@ $(CFLAGS) $(OBJS) $(TTY_OBJS) $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-$(RM) $B/k2ew_tcp $B/k2ew_tcp.exe
+	-$(RM) $B/k2ew_tty $B/k2ew_tty.exe
+
+PHONY:

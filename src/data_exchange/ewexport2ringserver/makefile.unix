@@ -1,0 +1,30 @@
+SUB_DIRS = src
+
+unix_modules: PHONY
+	@for x in $(SUB_DIRS) ; \
+	do  ( \
+		cd $$x && \
+			echo ---------- ; \
+			echo Making $@ in: `pwd` ; \
+			$(MAKE) -f makefile.unix \
+	) ; done
+
+
+# Clean-up rules
+clean: PHONY
+	-@for x in $(SUB_DIRS) ; \
+	do ( \
+		cd $$x && \
+			echo Cleaning in: `pwd` ; \
+			$(MAKE) -f makefile.unix clean \
+	) ; done
+
+clean_bin: PHONY
+	-@for x in $(SUB_DIRS) ; \
+	do ( \
+		cd $$x && \
+			echo Cleaning binaries in: `pwd` ; \
+			$(MAKE) -f makefile.unix clean_bin \
+	) ; done
+
+PHONY:

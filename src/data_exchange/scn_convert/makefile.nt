@@ -1,0 +1,55 @@
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG = 1
+!ENDIF
+
+!include <Win32.Mak>
+
+CFLAGS  = $(cflags)    $(cdebug) $(cvarsmt)   $(GLOBALFLAGS)
+LDFLAGS = $(conlflags) $(ldebug) $(conlibsmt)
+
+B = $(EW_HOME)\$(EW_VERSION)\bin
+L = $(EW_HOME)\$(EW_VERSION)\lib
+
+APP1 = scn2scnl
+APP2 = scnl2scn
+
+OBJ1 = \
+	$(APP1).obj \
+	scn_config.obj \
+	scn_convert.obj \
+	to_coda_scnl.obj \
+	to_pick_scnl.obj \
+	to_trace_scnl.obj
+OBJ2 = \
+	$(APP2).obj \
+	scnl_config.obj \
+	scnl_convert.obj \
+	to_coda2k.obj \
+	to_pick2k.obj \
+	to_trace_scn.obj
+
+all:	$B\$(APP1).exe \
+	$B\$(APP2).exe
+
+EW_LIBS = \
+	/LIBPATH:$L \
+	rdpickcoda.obj \
+	libew_mt.lib
+
+$B\$(APP1).exe: $(OBJ1)
+	$(link) /out:$@ $(LDFLAGS) $(OBJ1) $(EW_LIBS)
+
+$B\$(APP2).exe: $(OBJ2)
+	$(link) /out:$@ $(LDFLAGS) $(OBJ2) $(EW_LIBS)
+
+
+# Clean-up rules
+clean: PHONY
+	-del a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-del $B\$(APP1) $B\$(APP1).exe
+	-del $B\$(APP2) $B\$(APP2).exe
+
+PHONY:

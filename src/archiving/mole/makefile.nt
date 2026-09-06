@@ -1,0 +1,37 @@
+MYSQL_CONNECTOR_C_PATH_BUILD = ..\mysql-connector-c-build
+
+ew2moledb: PHONY
+	@pushd $@ & \
+		for /f "delims=" %d in ( 'cd' ) do @echo Making $@ in: %d & \
+		$(MAKE) /$(MAKEFLAGS) /f makefile.nt & \
+	popd
+
+
+# Clean-up rules
+clean:	clean\here \
+	clean\ew2moledb
+
+clean\here: PHONY
+	-del a.out core *.o *.obj *% *~
+
+clean\ew2moledb: PHONY
+	-@pushd $(@F) & \
+		for /f "delims=" %d in ( 'cd' ) do @echo Cleaning in: %d & \
+		$(MAKE) /$(MAKEFLAGS) /f makefile.nt clean & \
+	popd
+
+clean_bin: \
+	clean_bin\here \
+	clean_bin\ew2moledb
+
+clean_bin\here: PHONY
+	-del mysql-connector-c-6.0.2\CMakeCache.txt
+	-del /s $(MYSQL_CONNECTOR_C_PATH_BUILD)\*
+
+clean_bin\ew2moledb: PHONY
+	-@pushd $(@F) & \
+		for /f "delims=" %d in ( 'cd' ) do @echo Cleaning binaries in: %d & \
+		$(MAKE) /$(MAKEFLAGS) /f makefile.nt clean_bin & \
+	popd
+
+PHONY:

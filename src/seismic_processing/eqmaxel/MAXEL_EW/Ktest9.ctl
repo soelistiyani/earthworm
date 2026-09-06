@@ -1,0 +1,11 @@
+nobs=9
+observed time=phase9.dat
+station list=stn.coord
+trtable = Ktrtime.tbl
+Xc = 127.50
+Yc = 35.80
+verbose=1
+bradius=5.
+bayes=0
+coord=0
+likelihood=1

@@ -1,0 +1,22 @@
+#
+# Dummy makefile - only used for cleaning things up
+#
+
+B = $(EW_HOME)\$(EW_VERSION)\bin
+
+APP1 = ring2file
+APP2 = file2ring
+
+$B\$(APP1).exe: FAIL
+$B\$(APP2).exe: FAIL
+
+
+# Clean-up rules
+clean: PHONY
+	-del a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-del $B\$(APP1) $B\$(APP1).exe
+	-del $B\$(APP2) $B\$(APP2).exe
+
+PHONY:

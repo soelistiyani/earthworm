@@ -1,0 +1,44 @@
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG=1
+!ENDIF
+
+!include <ntwin32.mak>
+
+CFLAGS  = $(cflags)    $(cdebug) $(cvarsmt)   $(GLOBALFLAGS)
+LDFLAGS = $(conlflags) $(ldebug) $(conlibsmt)
+
+B = $(EW_HOME)\$(EW_VERSION)\bin
+L = $(EW_HOME)\$(EW_VERSION)\lib
+
+APP = ewpublish
+
+OBJS = $(APP).obj
+
+EW_LIBS = \
+	/LIBPATH:$L \
+	brent.obj \
+	chron3.obj \
+	getutil.obj \
+	kom.obj \
+	logit_mt.obj \
+	mnbrak.obj \
+	site.obj \
+	sleep_ew.obj \
+	time_ew.obj \
+	tlay.obj \
+	transport.obj \
+	libew_mt.lib
+
+$B\$(APP).exe: $(OBJS)
+	$(link) /out:$@ $(LDFLAGS) $(OBJS) $(EW_LIBS)
+
+
+# Clean-up rules
+clean: PHONY
+	-del a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-del $B\$(APP) $B\$(APP).exe
+
+PHONY:

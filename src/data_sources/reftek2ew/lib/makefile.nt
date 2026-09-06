@@ -1,0 +1,28 @@
+# Make all libraries
+
+reftek rtp util: PHONY
+	@pushd $@ & \
+		echo ---------- & \
+		for /f "delims=" %d in ( 'cd' ) do @echo Making $@ in: %d & \
+		$(MAKE) /$(MAKEFLAGS) /f makefile.nt & \
+	popd
+
+
+# Clean-up rules
+clean:	clean\here \
+	clean\reftek \
+	clean\rtp \
+	clean\util
+
+clean\here: PHONY
+	-del a.out core *.o *.obj *% *~
+
+clean\reftek \
+clean\rtp \
+clean\util: PHONY
+	-@pushd $(@F) & \
+		for /f "delims=" %d in ( 'cd' ) do @echo Cleaning in: %d & \
+		$(MAKE) /$(MAKEFLAGS) /f makefile.nt clean & \
+	popd
+
+PHONY:

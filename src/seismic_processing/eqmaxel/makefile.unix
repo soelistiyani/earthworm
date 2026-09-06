@@ -1,0 +1,82 @@
+LINUX_FLAGS    = -lm -lpthread
+SOLARIS_FLAGS  = -lm -lrt -lpthread
+SPECIFIC_FLAGS = $($(PLATFORM)_FLAGS)
+
+CFLAGS = $(GLOBALFLAGS) -I$M
+
+B = $(EW_HOME)/$(EW_VERSION)/bin
+L = $(EW_HOME)/$(EW_VERSION)/lib
+
+M = MAXEL_EW
+
+APP = eqmaxel
+
+OBJS = \
+	$(APP).o \
+	azi.o \
+	basic.o \
+	bind.o \
+	confidence.o \
+	eigen.o \
+	gap.o \
+	ll2utm.o \
+	mkreport.o \
+	pnpoly.o \
+	read_obslist.o \
+	read_stnlist.o \
+	run_mle.o \
+	sample_stn.o \
+	trtable.o
+
+EW_LIBS = \
+	$L/brent.o \
+	$L/mnbrak.o \
+	$L/pipe.o \
+	$L/site.o \
+	$L/tlay.o \
+	-L$L -lew_mt
+
+all:	$B/$(APP) \
+	$B/feedeqmaxel \
+	$B/bldtrtable
+
+$B/$(APP): $(OBJS)
+	$(CC) -o $@ $(CFLAGS) $(OBJS) $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+bind.o:		$M/bind.c
+confidence.o:	$M/confidence.c
+ll2utm.o:	$M/ll2utm.c
+trtable.o:	$M/trtable.c
+run_mle.o:	$M/run_mle.c
+read_stnlist.o:	$M/read_stnlist.c
+gap.o:		$M/gap.c
+eigen.o:	$M/eigen.c
+azi.o:		$M/azi.c
+pnpoly.o:	$M/pnpoly.c
+sample_stn.o:	$M/sample_stn.c
+basic.o:	$M/basic.c
+read_obslist.o:	$M/read_obslist.c
+mkreport.o:	$M/mkreport.c
+
+%.o:		$M/%.c
+	$(CC) -c $(CFLAGS) $(CPPFLAGS) $<
+
+$B/feedeqmaxel: feedeqmaxel.o
+	$(CC) -o $@ $(CFLAGS) feedeqmaxel.o \
+		$L/pipe.o -L$L -lew_mt $(SPECIFIC_FLAGS)
+
+$B/bldtrtable: bldtrtable.o
+	$(CC) -o $@ $(CFLAGS) bldtrtable.o \
+		$L/brent.o $L/mnbrak.o $L/tlay.o -L$L -lew_mt $(SPECIFIC_FLAGS)
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-$(RM) $B/$(APP)      $B/$(APP).exe
+	-$(RM) $B/feedeqmaxel $B/feedeqmaxel.exe
+	-$(RM) $B/bldtrtable  $B/bldtrtable.exe
+
+PHONY:

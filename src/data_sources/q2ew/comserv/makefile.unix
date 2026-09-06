@@ -1,0 +1,36 @@
+########################################################################
+# Ilya Dricker (IGD) 2006/11/16
+# I clean comserv directory leaving only util subdir: this is what q2ew
+# needs. Correspondingly, I changed Makefiles
+########################################################################
+
+SUB_DIRS = util
+
+all:
+	@for x in $(SUB_DIRS) ; \
+	do  ( \
+		cd $$x && \
+			echo ---------- ; \
+			echo Making $@ in: `pwd` ; \
+			$(MAKE) -f makefile.unix all \
+	) ; done
+
+
+# Clean-up rules
+clean: PHONY
+	-@for x in $(SUB_DIRS) ; \
+	do ( \
+		cd $$x && \
+			echo Cleaning in: `pwd` ; \
+			$(MAKE) -f makefile.unix clean \
+	) ; done
+
+veryclean: PHONY
+	-@for x in $(SUB_DIRS) ; \
+	do ( \
+		cd $$x && \
+			echo Cleaning in: `pwd` ; \
+			$(MAKE) -f makefile.unix veryclean \
+	) ; done
+
+PHONY:

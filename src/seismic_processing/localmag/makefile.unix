@@ -1,0 +1,65 @@
+LINUX_FLAGS    = -lm -lpthread
+SOLARIS_FLAGS  = -lm -lnsl -lsocket -lrt -lpthread
+SPECIFIC_FLAGS = $($(PLATFORM)_FLAGS)
+
+CFLAGS = $(GLOBALFLAGS) $(UW_FLAGS)
+
+# To turn on UW-specific features, uncomment the following four lines.
+#UW_FLAGS = -Xc -DUW -I$(SNAPSHOME)/Src/Utils
+#UW_OBJ = lm_uw.o uwresp.o
+#UW_LIBS = -L$(SNAPSHOME)/Src/Utils -lutils
+#LDC = f77
+
+B = $(EW_HOME)/$(EW_VERSION)/bin
+L = $(EW_HOME)/$(EW_VERSION)/lib
+
+APP = localmag
+
+OBJS = \
+	lm_main.o \
+	lm_config.o \
+	lm_misc.o \
+	lm_sac.o \
+	lm_site.o \
+	lm_util.o \
+	lm_ws.o \
+	lm_xml_event.o \
+	$(UW_OBJ)
+
+EW_LIBS = \
+	$L/brent.o \
+	$L/dirops_ew.o \
+	$L/fft_prep.o \
+	$L/fft99.o \
+	$L/get_ip_format_string.o \
+	$L/mem_circ_queue.o \
+	$L/mnbrak.o \
+	$L/parse_ip_address.o \
+	$L/read_arc.o \
+	$L/rw_mag.o \
+	$L/socket_ew.o \
+	$L/socket_ew_common.o \
+	$L/swap.o \
+	$L/tlay.o \
+	$L/transfer.o \
+	$L/ws_clientII.o \
+	-L$L -lew_mt
+
+$B/$(APP): $(OBJS)
+	$(CC) -o $@ $(CFLAGS) $(OBJS) $(UW_LIBS) $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+$B/readresp: readresp.o
+	$(CC) -o $@ $(CFLAGS) $(FFLAGS) readresp.o \
+		$L/fft_prep.o $L/fft99.o $L/logit_mt.o $L/time_ew.o \
+		$L/transfer.o $(UW_OBJ)
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-$(RM) $B/$(APP)   $B/$(APP).exe
+	-$(RM) $B/readresp $B/readresp.exe
+
+PHONY:

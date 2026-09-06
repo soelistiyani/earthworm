@@ -1,0 +1,52 @@
+LINUX_FLAGS    = -lm -lpthread
+SOLARIS_FLAGS  = -lm -lrt -lpthread
+SPECIFIC_FLAGS = $($(PLATFORM)_FLAGS)
+
+CFLAGS = $(GLOBALFLAGS)
+
+B = $(EW_HOME)/$(EW_VERSION)/bin
+L = $(EW_HOME)/$(EW_VERSION)/lib
+
+APP = ewhtmlreport
+
+OBJS = \
+	$(APP).o \
+	ew_csv.o \
+	ewjson.o
+
+EW_LIBS = \
+	$L/dirops_ew.o \
+	$L/read_arc.o \
+	$L/rw_mag.o \
+	$L/site.o \
+	-L$L -lew_mt
+
+### Removed until alternative can be found
+#webdata.h: ewhtmlreport.html ewhtmlreport.js
+#	xxd -i ewhtmlreport.html > webdata.h
+#	xxd -i ewhtmlreport.js >> webdata.h
+#	xxd -i dygraph-combined.js >> webdata.h
+#ewhtmlreport_html.o: ewhtmlreport.html
+#	objcopy --input binary --output elf32-i386 --binary-architecture i386 \
+#	ewhtmlreport.html ewhtmlreport_html.o
+#
+#ewhtmlreport_js.o: ewhtmlreport.js
+#	objcopy --input binary --output elf32-i386 --binary-architecture i386 \
+#	ewhtmlreport.js ewhtmlreport_js.o
+#
+#dygraph.o: dygraph-combined.js
+#	objcopy --input binary --output elf32-i386 --binary-architecture i386 \
+#	dygraph-combined.js dygraph.o
+
+$B/$(APP): $(OBJS)
+	$(CC) -o $@ $(CFLAGS) $(OBJS) $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-$(RM) $B/$(APP) $B/$(APP).exe
+
+PHONY:

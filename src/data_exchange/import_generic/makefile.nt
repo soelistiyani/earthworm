@@ -1,0 +1,40 @@
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG = 1
+!ENDIF
+
+!include <Win32.Mak>
+
+# added -D_NTSDK to enable definition of getpid() as _getpid() LDD.
+CFLAGS  = $(cflags)    $(cdebug) $(cvarsmt)   $(GLOBALFLAGS) /D_NTSDK
+LDFLAGS = $(conlflags) $(ldebug) $(conlibsmt)
+
+B = $(EW_HOME)\$(EW_VERSION)\bin
+L = $(EW_HOME)\$(EW_VERSION)\lib
+
+EW_LIBS = \
+	/LIBPATH:$L \
+	socket_ew.obj \
+	socket_ew_common.obj \
+	libew_mt.lib
+
+#all: $B\import_generic.exe
+all: $B\import_ack.exe
+
+$B\import_generic.exe: import_generic.obj
+	$(link) /out:$@ $(LDFLAGS) import_generic.obj $(EW_LIBS)
+
+$B\import_ack.exe: import_ack.obj
+	$(link) /out:$@ $(LDFLAGS) import_ack.obj $(EW_LIBS)
+	copy /Y $B\import_ack.exe $B\import_generic.exe
+
+
+# Clean-up rules
+clean: PHONY
+	-del a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-del $B\import_generic $B\import_generic.exe
+	-del $B\import_ack     $B\import_ack.exe
+
+PHONY:

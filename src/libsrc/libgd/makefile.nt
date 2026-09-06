@@ -1,0 +1,52 @@
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG = 1
+!ENDIF
+
+!include <Win32.Mak>
+
+CFLAGS  = $(cflags)    $(cdebug) $(cvarsmt)   $(GLOBALFLAGS)
+LDFLAGS = $(conlflags) $(ldebug) $(conlibsmt)
+
+L = $(EW_HOME)\$(EW_VERSION)\lib
+B = $(EW_HOME)\$(EW_VERSION)\bin
+
+OBJS = \
+	gd.obj \
+	gdfontg.obj \
+	gdfontl.obj \
+	gdfontmb.obj \
+	gdfonts.obj \
+	gdfontt.obj
+
+EW_LIBS = /LIBPATH:$L libgd.lib
+
+all:	$L\libgd.lib \
+	$B\gddemo.exe \
+	$B\giftogd.exe \
+	$B\webgif.exe
+
+$L\libgd.lib: $(OBJS)
+	lib /nologo /out:$@ $(OBJS)
+
+$B\gddemo.exe: gddemo.obj gd.h gdfonts.h gdfontl.h
+	$(link) /out:$@ $(LDFLAGS) gddemo.obj $(EW_LIBS)
+
+$B\giftogd.exe: giftogd.obj gd.h
+	$(link) /out:$@ $(LDFLAGS) giftogd.obj $(EW_LIBS)
+
+$B\webgif.exe: webgif.obj gd.h
+	$(link) /out:$@ $(LDFLAGS) webgif.obj $(EW_LIBS)
+
+
+# Clean-up rules
+clean: PHONY
+	-del a.out core *.o *.obj *% *~
+	-del $L\libgd.a $L\libgd.lib
+
+clean_bin: PHONY
+	-del $B\gddemo  $B\gddemo.exe
+	-del $B\giftogd $B\giftogd.exe
+	-del $B\webgif  $B\webgif.exe
+
+PHONY:

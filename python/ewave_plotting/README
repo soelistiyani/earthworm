@@ -1,0 +1,58 @@
+===OVERVIEW===
+EWAVE is a plotting service that connects to an EW wave server and plots records
+
+Queries may be directed to a RESTful API, and additionally, a simple HTML form
+provides access via a web browser
+
+Currently, the main use of EWAVE is in generating plots for email alerts generated
+by EW's ewhtmlemail and gmewhtmlemail, although it is also possible to request records
+be returned as miniseed files.
+
+===USAGE===
+The RESTful interface is accessed via http, eg:
+
+http://[host]:[port]/ewave/query?net=IU&sta=KBL&cha=BHZ&loc=10&start=2019-05-01T12:00:00&dur=30
+
+Where 'net', 'sta', 'cha', 'loc' refer to network, station, channel, and location as one might
+expect, and 'start' refers to the start time of the stream, and 'dur' refers to the desired 
+timespan in seconds of data to be returned/plotted
+
+Those are the required parameters. Optional parameters include:
+
+'ptime' a time value (formatted in the same manner as 'start' above)
+'plabel' a string used to label the pick. 
+'outputFormat' valid options include 'plot'/'png' and 'miniseed'/'mseed'
+				by default, a PNG plot is returned
+'displayMaxValue' setting this to True results in the absolute maximum value
+					of the selected trace being plotted
+'scaleFactor' an optional floating point constant by which the maximum value
+				should be scaled (eg, when one wishes to convert from counts
+				to ground motion)
+'units'    a string used to label the maximum value (after having been scaled)
+
+The webform can be accessed by navigating a browser to
+http://[host]:[port]/ewave/form
+
+===SERVICE CONFIGURATION===
+Service settings are stored in the file 'settings.json'
+
+This allows for easy manipulation of settings like the waveserver host and port to reference,
+the color of the plot generated, and plot paramters like width and height (values refer to pixels)
+or DPI to be adjusted
+
+It is intended that later versions of this code support configurations of such things as the 
+port the service is provided on, an IP in case of a multi-homed system, control over security
+settings (eg allowing for service to be provided over https) and various fine-grained plotting 
+settings
+
+===SERVICE SETUP===
+Dependencies are listed in the file 'requirements.txt'
+
+It is highly recommended that the user manage these dependencies via Anaconda. The Obspy project,
+a core dependency, provides basic instructions on installing their package via Anaconda, which the
+uninitiated may find valuable: https://github.com/obspy/obspy/wiki/Installation-via-Anaconda
+
+===RUNNING===
+Upon installing all of the dependcies, EWAVE can be launched as a background service via
+
+$ nohup python ewave_api.py &> ewave_output.log &

@@ -1,0 +1,29 @@
+#
+# Dummy makefile - only used for cleaning things up
+#
+
+SUB_DIRS = util
+
+default: FAIL
+
+
+# Clean-up rules
+clean: PHONY
+	-@for %x in ( $(SUB_DIRS) ) \
+	do @( \
+		pushd %x & \
+			for /f "delims=" %d in ( 'cd' ) do @echo Cleaning in: %d & \
+			$(MAKE) /$(MAKEFLAGS) /f makefile.nt clean & \
+		popd \
+	)
+
+veryclean: PHONY
+	-@for %x in ( $(SUB_DIRS) ) \
+	do @( \
+		pushd %x & \
+			for /f "delims=" %d in ( 'cd' ) do @echo Cleaning in: %d & \
+			$(MAKE) /$(MAKEFLAGS) /f makefile.nt veryclean & \
+		popd \
+	)
+
+PHONY:

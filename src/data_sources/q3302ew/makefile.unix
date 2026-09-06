@@ -1,0 +1,37 @@
+LINUX_FLAGS    = -lm -lpthread
+SOLARIS_FLAGS  = -lm -lnsl -lsocket -lrt -lpthread
+SPECIFIC_FLAGS = $($(PLATFORM)_FLAGS)
+
+CFLAGS  = $(GLOBALFLAGS) -I$(LIB330_DIR)
+
+B = $(EW_HOME)/$(EW_VERSION)/bin
+L = $(EW_HOME)/$(EW_VERSION)/lib
+
+LIB330_DIR = $(EW_HOME)/$(EW_VERSION)/src/libsrc/lib330
+
+APP = q3302ew
+
+OBJS = \
+	$(APP).o \
+	config.o \
+	heart.o \
+	lib330Interface.o \
+	logging.o \
+	options.o
+
+EW_LIBS = -L$L -lew_mt
+
+LIB330 = -L$(LIB330_DIR) -l330
+
+$B/$(APP): $(OBJS)
+	$(CC) -o $@ $(CFLAGS) $(OBJS) $(LIB330) $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-$(RM) $B/$(APP) $B/$(APP).exe
+
+PHONY:

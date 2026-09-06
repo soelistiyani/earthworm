@@ -1,0 +1,73 @@
+#############################################################################
+# WARNING: this file is a meta-makefile written to adapt the compilation of
+# nmxptool when you are compiling it under Earthworm system. This file should
+# work for all operating systems using almost all 'make' programs.
+#
+# It is based on program 'test' and environment variables:
+#     $GLOBLAFLAGS, $EW_HOME, $EW_VERSION
+# If you have not 'gcc' maybe you was not able to compile 'libmseed'
+#     Set variable DISABLEFEATURES to "disable-libmseed".
+#
+# For Windows-XP and Windows-2000 compile under MinGW.
+#
+# make -f makefile.ux.nognu
+# make -f makefile.ux.nognu clean
+# make -f makefile.ux.nognu clean_bin
+#
+# make -f makefile.ux.nognu reconfigure
+#
+# make -f makefile.ux.nognu install
+# make -f makefile.ux.nognu distclean
+#
+# Author: Matteo Quintiliani - I.N.G.V. - matteo.quintiliani@ingv.it
+#############################################################################
+
+# If you do not use 'gcc' you can not compile 'libmseed', uncomment following line:
+# DISABLEFEATURES=--disable-libmseed
+
+CFLAGS += $(GLOBALFLAGS) -I$(EW_HOME)/$(EW_VERSION)/src/libsrc/util/libmseed
+LDFLAGS += -L$(EW_HOME)/$(EW_VERSION)/src/libsrc/util/libmseed
+
+B = $(EW_HOME)/$(EW_VERSION)/bin
+
+all: configurenmxp makenmxp installnmxp
+
+# Add distclean for Earthworm clean
+clean: cleannmxp distclean
+
+# Clean nmxptool binary from Earthworm system
+clean_bin: PHONY
+	-@( test ! -f Makefile ) \
+		|| ( $(MAKE) uninstall-ew-bin )
+	-$(RM) $B/nmxptool $B/nmxptool.exe
+
+reconfigure: distclean configurenmxp cleannmxp makenmxp installnmxp
+	
+installnmxp: PHONY
+	$(MAKE) install-ew-bin
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+install: installnmxp
+
+distclean: distcleannmxp
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+# Always remove existing Makefiles to force reconfigure when EW_BITS changes
+configurenmxp: PHONY
+	$(RM) Makefile src/Makefile
+	./configure $(DISABLEFEATURES) CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)"
+
+makenmxp: PHONY
+	$(MAKE)
+
+cleannmxp: PHONY
+	-@( test ! -f Makefile ) \
+		|| ( $(MAKE) clean )
+
+distcleannmxp: PHONY
+	-@( test ! -f Makefile ) \
+		|| ( $(MAKE) distclean )
+
+PHONY:

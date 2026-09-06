@@ -1,0 +1,20 @@
+#
+# Dummy makefile - only used for cleaning things up
+#
+
+B = $(EW_HOME)/$(EW_VERSION)/bin
+
+APP = latency_mon
+
+$B/$(APP): FAIL
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+	-$(RM) *.res
+
+clean_bin: PHONY
+	-$(RM) $B/$(APP) $B/$(APP).exe
+
+PHONY:

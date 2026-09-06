@@ -1,0 +1,77 @@
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG = 1
+!ENDIF
+
+!include <Win32.Mak>
+
+CFLAGS  = $(cflags)    $(cdebug) $(cvarsmt)   $(GLOBALFLAGS)
+LDFLAGS = $(conlflags) $(ldebug) $(conlibsmt)
+
+B = $(EW_HOME)\$(EW_VERSION)\bin
+L = $(EW_HOME)\$(EW_VERSION)\lib
+
+APP = pick_FP
+
+FilterPickerDir = picker
+
+OBJS = \
+	$(APP).obj \
+	call_FilterPicker.obj \
+	compare.obj \
+	config.obj \
+	index.obj \
+	initvar.obj \
+	report.obj \
+	restart.obj \
+	stalist.obj \
+	FilterPicker5.obj \
+	FilterPicker5_Memory.obj \
+	PickData.obj
+
+EW_LIBS = \
+	/LIBPATH:$L \
+	swap.obj \
+	trheadconv.obj \
+	libew_mt.lib
+
+$B\$(APP).exe: $(OBJS)
+	$(link) /out:$@ $(LDFLAGS) $(OBJS) $(EW_LIBS)
+
+FilterPicker5.obj:	$(FilterPickerDir)/FilterPicker5.c
+	$(CC) $(CFLAGS) $(FilterPickerDir)/FilterPicker5.c
+
+FilterPicker5_Memory.obj: $(FilterPickerDir)/FilterPicker5_Memory.c
+	$(CC) $(CFLAGS) $(FilterPickerDir)/FilterPicker5_Memory.c
+
+PickData.obj:		$(FilterPickerDir)/PickData.c
+	$(CC) $(CFLAGS) $(FilterPickerDir)/PickData.c
+
+
+# Clean-up rules
+clean:	clean\here \
+	clean\FilterPicker
+
+clean\here: PHONY
+	-del a.out core *.o *.obj *% *~
+
+clean\FilterPicker: PHONY
+	-@pushd $(FilterPickerDir) & \
+		for /f "delims=" %d in ( 'cd' ) do @echo Cleaning in: %d & \
+		$(MAKE) /$(MAKEFLAGS) /f makefile.nt clean & \
+	popd
+
+clean_bin: \
+	clean_bin\here \
+	clean_bin\FilterPicker
+
+clean_bin\here: PHONY
+	-del $B\$(APP) $B\$(APP).exe
+
+clean_bin\FilterPicker: PHONY
+	-@pushd $(FilterPickerDir) & \
+		for /f "delims=" %d in ( 'cd' ) do @echo Cleaning binaries in: %d & \
+		$(MAKE) /$(MAKEFLAGS) /f makefile.nt clean_bin & \
+	popd
+
+PHONY:

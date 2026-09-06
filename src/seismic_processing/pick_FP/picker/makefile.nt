@@ -1,0 +1,18 @@
+#
+# Dummy makefile - only used for cleaning things up
+#
+
+B = $(EW_HOME)\$(EW_VERSION)\bin
+
+default: FAIL
+
+
+# Clean-up rules
+clean: PHONY
+	-del a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-del $B\picker_func_test_memory  $B\picker_func_test_memory.exe
+	-del $B\picker_func_test         $B\picker_func_test.exe
+
+PHONY:

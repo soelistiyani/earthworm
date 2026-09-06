@@ -1,0 +1,31 @@
+LINUX_CFLAGS    = -O -I../..
+SOLARIS_CFLAGS  = -O -I../.. -DSOLARIS
+SPECIFIC_CFLAGS = $($(PLATFORM)_CFLAGS)
+
+CFLAGS = $(GLOBALFLAGS) $(SPECIFIC_CFLAGS)
+
+OBJS = \
+	accept.o \
+	attr.o \
+	close.o \
+	cmdpkt.o \
+	log.o \
+	misc.o \
+	open.o \
+	pid.o \
+	recv.o \
+	send.o \
+	server.o \
+	soh.o \
+	stat.o \
+	version.o
+
+../librtp.a: ../librtp.a($(OBJS))
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+	-$(RM) ../librtp.a ../librtp.lib
+
+PHONY:

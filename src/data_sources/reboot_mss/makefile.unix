@@ -1,0 +1,36 @@
+LINUX_FLAGS    = -lpthread
+SOLARIS_FLAGS  = -lnsl -lsocket -lrt -lpthread
+SPECIFIC_FLAGS = $($(PLATFORM)_FLAGS)
+
+CFLAGS = $(GLOBALFLAGS)
+
+B = $(EW_HOME)/$(EW_VERSION)/bin
+L = $(EW_HOME)/$(EW_VERSION)/lib
+
+APP = reboot_mss
+
+LINUX_OBJS = \
+	$(APP).o \
+	rb_lin.o \
+	rb_mss.o
+SOLARIS_OBJS = \
+	$(APP).o \
+	rb_mss.o \
+	rb_sol.o
+
+OBJS = $($(PLATFORM)_OBJS)
+
+EW_LIBS = $L/sleep_ew.o
+
+$B/$(APP): $(OBJS)
+	$(CC) -o $@ $(CFLAGS) $(OBJS) $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-$(RM) $B/$(APP) $B/$(APP).exe
+
+PHONY:

@@ -1,0 +1,36 @@
+# The socket calls to socket_lnx.c are broken on Linux/MacOS: undefined references
+# It is not known whether the Solaris or Windows version works
+
+LINUX_FLAGS    = -lpthread
+SOLARIS_FLAGS  = -lnsl -lsocket -lrt -lpthread
+SPECIFIC_FLAGS = $($(PLATFORM)_FLAGS)
+
+CFLAGS = $(GLOBALFLAGS)
+
+B = $(EW_HOME)/$(EW_VERSION)/bin
+
+APP = sendfile_srv
+
+OBJS = \
+	$(APP).o \
+	chdir_sol.o \
+	config.o \
+	fopen_sol.o \
+	getfname_sol.o \
+	log.o \
+	sleep_sol.o \
+	socket_lnx.o \
+	tzset_sol.o
+
+$B/$(APP): $(OBJS)
+	$(CC) -o $@ $(CFLAGS) $(OBJS) $(SPECIFIC_FLAGS)
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-$(RM) $B/$(APP) $B/$(APP).exe
+
+PHONY:

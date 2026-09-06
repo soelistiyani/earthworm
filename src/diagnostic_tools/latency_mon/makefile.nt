@@ -1,0 +1,51 @@
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG = 1
+!ENDIF
+
+!include <Win32.Mak>
+
+CFLAGS  = $(cflags)    $(cdebug) $(cvarsmt)   $(GLOBALFLAGS)
+LDFLAGS = $(guilflags) $(ldebug) $(guilibsmt)
+
+# for MS 2003 compiler (& earlier) syntax was: cvtres -$(CPU) $(APP).tmp -o $(APP).res
+# for MS 2005 compiler processor arch should be x86 not i386
+
+# if 64-bit target then set cvtres MACHINE to x64
+!IF "$(EW_BITS)" == "64"
+PROCESSOR_ARCHITECTURE=x64
+!ENDIF
+
+B = $(EW_HOME)\$(EW_VERSION)\bin
+L = $(EW_HOME)\$(EW_VERSION)\lib
+
+APP = latency_mon
+
+OBJS = \
+	$(APP).obj \
+	config.obj \
+	stalist.obj
+
+EW_LIBS = \
+	/LIBPATH:$L \
+	swap.obj \
+	libew_mt.lib
+
+$B\$(APP).exe: $(OBJS) $(APP).res
+	$(link) /out:$@ $(LDFLAGS) $(OBJS) $(EW_LIBS) $(APP).res
+
+$(APP).res: $(APP).rc
+	rc /nologo -r -fo $(APP).tmp $(APP).rc
+	cvtres /nologo /MACHINE:$(PROCESSOR_ARCHITECTURE) -o $(APP).res $(APP).tmp
+	del $(APP).tmp
+
+
+# Clean-up rules
+clean: PHONY
+	-del a.out core *.o *.obj *% *~
+	-del *.res
+
+clean_bin: PHONY
+	-del $B\$(APP) $B\$(APP).exe
+
+PHONY:

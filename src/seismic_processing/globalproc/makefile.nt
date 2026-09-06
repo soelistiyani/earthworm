@@ -1,0 +1,52 @@
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG=1
+!ENDIF
+
+!include <Win32.Mak>
+
+CFLAGS  = $(cflags)    $(cdebug) $(cvarsmt)   $(GLOBALFLAGS)
+LDFLAGS = $(conlflags) $(ldebug) $(conlibsmt)
+
+B = $(EW_HOME)\$(EW_VERSION)\bin
+L = $(EW_HOME)\$(EW_VERSION)\lib
+
+APP = globalproc
+
+OLSRC = $(EW_HOME)\$(EW_VERSION)\src\seismic_processing\geqproc
+
+OBJS = \
+	$(APP).obj \
+	init_ewevent.obj
+
+EW_LIBS = \
+	/LIBPATH:$L \
+	brent.obj \
+	dirops_ew.obj \
+	geo_to_km.obj \
+	global_amp_rw.obj \
+	global_loc_rw.obj \
+	global_msg.obj \
+	global_pick_rw.obj \
+	mnbrak.obj \
+	site.obj \
+	swap.obj \
+	tlay.obj \
+	watchdog_client.obj \
+	libew_mt.lib
+
+$B\$(APP).exe: $(OBJS)
+	$(link) /out:$@ $(LDFLAGS) $(OBJS) $(EW_LIBS)
+
+init_ewevent.obj: $(OLSRC)\init_ewevent.c
+	$(CC) $(CFLAGS) $(OLSRC)\init_ewevent.c
+
+
+# Clean-up rules
+clean: PHONY
+	-del a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-del $B\$(APP) $B\$(APP).exe
+
+PHONY:

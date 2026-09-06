@@ -1,0 +1,33 @@
+SUB_DIRS = src
+
+nt_modules: PHONY
+	@for %x in ( $(SUB_DIRS) ) \
+	do @( \
+		pushd %x & \
+			echo ---------- & \
+			for /f "delims=" %d in ( 'cd' ) do @echo Making $@ in: %d & \
+			$(MAKE) /$(MAKEFLAGS) /f makefile.nt & \
+		popd \
+	)
+
+
+# Clean-up rules
+clean: PHONY
+	-@for %x in ( $(SUB_DIRS) ) \
+	do @( \
+		pushd %x & \
+			for /f "delims=" %d in ( 'cd' ) do @echo Cleaning in: %d & \
+			$(MAKE) /$(MAKEFLAGS) /f makefile.nt clean & \
+		popd \
+	)
+
+clean_bin: PHONY
+	-@for %x in ( $(SUB_DIRS) ) \
+	do @( \
+		pushd %x & \
+			for /f "delims=" %d in ( 'cd' ) do @echo Cleaning binaries in: %d & \
+			$(MAKE) /$(MAKEFLAGS) /f makefile.nt clean_bin & \
+		popd \
+	)
+
+PHONY:

@@ -1,0 +1,78 @@
+LINUX_FLAGS    = -lm -lpthread
+SOLARIS_FLAGS  = -lm -lrt -lpthread
+SPECIFIC_FLAGS = $($(PLATFORM)_FLAGS)
+
+CFLAGS = $(GLOBALFLAGS) -I$(QLIB_DIR)
+
+B = $(EW_HOME)/$(EW_VERSION)/bin
+L = $(EW_HOME)/$(EW_VERSION)/lib
+
+QLIB_DIR = $(EW_HOME)/$(EW_VERSION)/src/libsrc/qlib2
+
+QLIB_LIB = -L$(QLIB_DIR)/lib_ew -lqlib2nl
+
+EW_LIBS = \
+	$L/swap.o \
+	-L$L -lew_mt
+MSLIBS = -L$L -lmseed
+DCLIBS = $L/dirops_ew.o $(EW_LIBS)
+
+all:	$B/remux_tbuf \
+	$B/sac2tb \
+	$B/ms2tb \
+	$B/ring2tank \
+	$B/tr2dump \
+	$B/ms2tank \
+	$B/tankcut \
+	$B/tanksniff \
+	$B/wsvtank2tb
+	
+$B/remux_tbuf: remux_tbuf.o remux_code.o
+	$(CC) -o $@ $(CFLAGS) remux_tbuf.o remux_code.o $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+$B/tanksniff: tanksniff.o
+	$(CC) -o $@ $(CFLAGS) tanksniff.o $(EW_LIBS) $(SPECIFIC_FLAGS)
+	
+$B/sac2tb: sac2tb.o
+	$(CC) -o $@ $(CFLAGS) sac2tb.o $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+$B/ring2tank: ring2tank.o
+	$(CC) -o $@ $(CFLAGS) ring2tank.o $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+$B/ms2tb: ms2tb.o read_mseed_data.o
+	$(CC) -o $@ $(CFLAGS) ms2tb.o read_mseed_data.o -L$(L) $(QLIB_LIB) $(SPECIFIC_FLAGS)
+
+$B/ms2tank: ms2tank.o mseed2tank.o
+	$(CC) -o $@ $(CFLAGS) mseed2tank.o ms2tank.o $(MSLIBS) $(SPECIFIC_FLAGS)
+
+$B/dc2tank: dc2tank.o mseed2tank.o remux_code.o
+	$(CC) -o $@ $(CFLAGS) dc2tank.o mseed2tank.o remux_code.o $(MSLIBS) $(DCLIBS) $(SPECIFIC_FLAGS)
+
+$B/tankcut: tankcut.o remux_code.o
+	$(CC) -o $@ $(CFLAGS) tankcut.o remux_code.o $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+$B/tr2dump: tr2dump.o
+	$(CC) -o $@ $(CFLAGS) tr2dump.o $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+$B/wsvtank2tb: wsvtank2tb.o
+	$(CC) -o $@ $(CFLAGS) wsvtank2tb.o $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-$(RM) $B/dc2tank    $B/dc2tank.exe
+	-$(RM) $B/ms2tank    $B/ms2tank.exe
+	-$(RM) $B/ms2tb      $B/ms2tb.exe
+	-$(RM) $B/remux_tbuf $B/remux_tbuf.exe
+	-$(RM) $B/ring2tank  $B/ring2tank.exe
+	-$(RM) $B/sac2tb     $B/sac2tb.exe
+	-$(RM) $B/smb2tb     $B/smb2tb.exe
+	-$(RM) $B/tankcut    $B/tankcut.exe
+	-$(RM) $B/tanksniff  $B/tanksniff.exe
+	-$(RM) $B/tr2dump    $B/tr2dump.exe
+	-$(RM) $B/wsvtank2tb $B/wsvtank2tb.exe
+
+PHONY:

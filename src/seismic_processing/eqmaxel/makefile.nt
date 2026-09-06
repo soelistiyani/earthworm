@@ -1,0 +1,21 @@
+#
+# Dummy makefile - only used for cleaning things up
+#
+
+B = $(EW_HOME)\$(EW_VERSION)\bin
+
+APP = eqmaxel
+
+$B/$(APP): FAIL
+
+
+# Clean-up rules
+clean: PHONY
+	-del a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-del $B/$(APP)      $B/$(APP).exe
+	-del $B/feedeqmaxel $B/feedeqmaxel.exe
+	-del $B/bldtrtable  $B/bldtrtable.exe
+
+PHONY:

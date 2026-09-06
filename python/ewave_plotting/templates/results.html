@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}ewave{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+	<h1>Please enter the stream parameters below:</h1>
+</div>
+<div class="container-fluid">
+	<a href="static/{{outputfile}}" class="btn btn-success btn-lg active" role="button" aria-pressed="true">Download Data</a>
+</div>
+{% endblock %}

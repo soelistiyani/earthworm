@@ -1,0 +1,61 @@
+.TH "include/nmxp_memory.h" 3 "Wed Feb 10 2016" "Version 1.2.4" "libnmxp" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+include/nmxp_memory.h \- Memory management for Nanometrics Protocol Library\&.  
+
+.SH SYNOPSIS
+.br
+.PP
+.SS "Macros"
+
+.in +1c
+.ti -1c
+.RI "#define \fBNMXP_MEM_MALLOC\fP(size)   malloc(size)"
+.br
+.ti -1c
+.RI "#define \fBNMXP_MEM_STRDUP\fP(str)   strdup(str)"
+.br
+.ti -1c
+.RI "#define \fBNMXP_MEM_FREE\fP(ptr)   free(ptr); ptr=NULL;"
+.br
+.ti -1c
+.RI "#define \fBNMXP_MEM_PRINT_PTR\fP(print_items,  print_sfs)   \fBnmxp_mem_null_function\fP()"
+.br
+.ti -1c
+.RI "#define \fBNMXP_MEM_PRINT_SFS\fP()   \fBnmxp_mem_null_function\fP()"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "int \fBnmxp_mem_null_function\fP ()"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+Memory management for Nanometrics Protocol Library\&. 
+
+Author: Matteo Quintiliani Istituto Nazionale di Geofisica e Vulcanologia - Italy quintiliani@ingv.it
+.PP
+$Id $ 
+.SH "Macro Definition Documentation"
+.PP 
+.SS "#define NMXP_MEM_MALLOC(size)   malloc(size)"
+
+.SS "#define NMXP_MEM_STRDUP(str)   strdup(str)"
+
+.SS "#define NMXP_MEM_FREE(ptr)   free(ptr); ptr=NULL;"
+
+.SS "#define NMXP_MEM_PRINT_PTR(print_items, print_sfs)   \fBnmxp_mem_null_function\fP()"
+
+.SS "#define NMXP_MEM_PRINT_SFS()   \fBnmxp_mem_null_function\fP()"
+
+.SH "Function Documentation"
+.PP 
+.SS "int nmxp_mem_null_function ()"
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libnmxp from the source code\&.

@@ -1,0 +1,40 @@
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG=1
+!ENDIF
+
+!include <Win32.Mak>
+
+# added -D_NTSDK to enable definition of ftime() as _ftime()  LDD.
+CFLAGS  = $(cflags)    $(cdebug) $(cvarsmt)   $(GLOBALFLAGS) /D_NTSDK
+LDFLAGS = $(conlflags) $(ldebug) $(conlibsmt)
+
+B = $(EW_HOME)\$(EW_VERSION)\bin
+L = $(EW_HOME)\$(EW_VERSION)\lib
+
+APP = evanstrig
+
+OBJS = \
+	$(APP).obj \
+	compare.obj \
+	interpolate.obj \
+	mteltrg.obj \
+	mutils.obj
+
+EW_LIBS = \
+	/LIBPATH:$L \
+	swap.obj \
+	libew_mt.lib
+
+$B\$(APP).exe: $(OBJS)
+	$(link) /out:$@ $(LDFLAGS) $(OBJS) $(EW_LIBS)
+
+
+# Clean-up rules
+clean: PHONY
+	-del a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-del $B\$(APP) $B\$(APP).exe
+
+PHONY:

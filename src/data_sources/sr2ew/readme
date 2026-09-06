@@ -1,0 +1,100 @@
+FILE: readme                    Copyright (c), Symmetric Research, 2010-2018
+
+sr2ew is a program for sending data from a SR USBxCH 24 bit A/D
+data acquisition system to an Earthworm WAVE_RING buffer as
+TYPE_TRACEBUF2 messages.
+
+In order to run successfully, a copy of the Symmetric Research USBxCH
+software for your Windows or Linux OS is required.  The most current
+and up-to-date version of the SR USBxCH software is always available
+free from the download page of our website: www.symres.com.
+
+In order to run sr2ew, a USBxCH board must be properly connected to
+your computer.  Before using the USBxCH with Earthworm, we strongly
+recommend you follow the instructions included with the full USBxCH
+software for setting up the board and then verify its correct
+operation using the included diag and scope programs.
+
+Once you have both Earthworm and the USBxCH working separately, you
+should edit the sr2ew.d and Sr2Ew.ini configuration values so they
+match your hardware setup.  You will probably also need to edit some
+additional Earthworm configuration files like startstop.d,
+wave_serverV.d, export_scn.d, etc to handle the data srusb2ew will be
+providing.  Some example steps are given below.  
+
+For additional configuration help, please refer to the Earthworm
+example in the \SR\USBXCH\Examples directory.  This directory contains
+explanations, support files, and a consistent set of configuration
+files appropriate for a very simple Earthworm setup using Symmetric
+Research equipment.  They can be a good starting point from which to
+customize your own configuration files.  
+
+                   ********* NOTE ********* 
+Users of equipment from other manufacturers or those wishing to run
+more complicated setups are advised to start from the Memphis Test
+suite instead.  Look for it on the official earthworm site maintained
+by ISTI at: earthwormcentral.org
+                   ********* NOTE ********* 
+
+For more details about how the sr2ew module is organized, please see
+the comments at the top of the .c source file.
+    
+For support or to suggest improvements, please contact Wendy Tucker at
+Symmetric Research (email: info@symres.com).
+
+The files in this directory are:
+ readme                  this file
+ sr2ew_ovr.html          HTML page with sr2ew overview
+ sr2ew_cmd.html          HTML page with configuration command descriptions
+ sr2ew.desc              the descriptor file for sr2ew required by statmgr
+ sr2ew.d                 configuration info for sr2ew and EW parameters
+ Sr2Ew.ini               configuration info for the SR pipeline utilities
+ Sr2EwPipeline           Linux script file for starting the pipeline chain
+ Sr2EwPipeline.bat       Windows batch file for starting the pipeline chain
+ Sr2EwPipelineKill       Linux script file for ending the pipeline chain
+ Sr2EwPipelineKill.bat   Windows batch file for ending the pipeline chain
+ makefile.nt             creates the executable for sr2ew on Windows
+ makefile.ux             creates the executable for sr2ew on Linux
+ sr2ew.c                 source file for the sr2ew module
+ CustomPipeLib.Lnx       Linux source file for pipe functions called by sr2ew
+ CustomPipeLib.Win       Windows source file for pipe functions called by sr2ew
+ CustomPipeLib.h         include file for pipe functions
+
+
+
+To run sr2ew, do the following:
+
+1) Install Earthworm.  Test it.
+
+2) Setup the SR hardware and software.  Install the SR software that 
+   came with your USBxCH.  Hook up the hardware and use the included
+   diagnostic program to make sure it's working properly.
+
+3) Put sr2ew.d, sr2ew.desc, Sr2Ew.ini, Sr2EwPipeline.bat, and 
+   Sr2EwPipelineKill.bat (or Sr2EwPipeline and Sr2EwPipelineKill for Linux)
+   in the run params directory (eg \earthworm\run_working\params)
+   making sure the batch files have execute permission.
+
+5) Edit sr2ew.d and Sr2Ew.ini so the parameters match your situation 
+   such as selecting the desired channel names and sampling rate, etc
+
+6) Edit startstop_nt.d to also control sr2ew by adding lines like:
+
+   Process          "sr2ew"
+   PriorityClass     Normal
+   ThreadPriority    Normal
+   Display           NewConsole
+
+   Note that the configuration file is hardwired to come from
+   "%EW_PARAMS%/sr2ew.d".
+
+7) Edit wave_serverV.d to save the USBxCH data into tanks 
+   eg add lines like:
+
+   Tank    SRHQ HNZ SR C0 880   INST_UNKNOWN  MOD_WILDCARD       1         10000         c:\earthworm\v7.4\run_symres\data\pch00.tnk
+
+8) Edit wave_viewer.d or the config file for another viewer
+   to see the USBxCH data.
+
+Then startstop earthworm and the system will begin acquiring data.
+

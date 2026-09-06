@@ -1,0 +1,52 @@
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG = 1
+!ENDIF
+
+!include <Win32.Mak>
+
+CFLAGS  = $(cflags)    $(cdebug) $(cvarsmt)   $(GLOBALFLAGS) /D_ADD_TRACE2_HEADER_
+
+L = $(EW_HOME)\$(EW_VERSION)\lib
+
+PICKLIB = libebpick.lib
+LOCLIB  = libebloc.lib
+
+# loc_wcatwc and pick_wcatwc need these
+EB_LIBS = \
+	diskrw.obj \
+	filters.obj \
+	geotools.obj \
+	get_pick.obj \
+	mags.obj \
+	mjstime.obj \
+	ReadStationData.obj \
+	report.obj \
+	taulib.obj
+
+# loc_wcatwc needs these
+EB_LIBS_LOC = \
+	display.obj \
+	dummy.obj \
+	fereg.obj \
+	get_hypo.obj \
+	littoral.obj \
+	locquake.obj \
+	logquake.obj
+
+all: $L\$(PICKLIB) $L\$(LOCLIB)
+
+$L\$(PICKLIB): $(EB_LIBS)
+	lib /nologo /out:$@ $(EB_LIBS)
+
+$L\$(LOCLIB): $(EB_LIBS_LOC)
+	lib /nologo /out:$@ $(EB_LIBS_LOC)
+
+
+# Clean-up rules
+clean: PHONY
+	-del a.out core *.o *.obj *% *~
+	-del $L\libebpick.a $L\libebpick.lib
+	-del $L\libebloc.a  $L\libebloc.lib
+
+PHONY:

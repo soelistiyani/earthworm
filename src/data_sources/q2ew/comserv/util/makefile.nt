@@ -1,0 +1,14 @@
+#
+# Dummy makefile - only used for cleaning things up
+#
+
+default: FAIL
+
+
+# Clean-up rules
+clean \
+veryclean: PHONY
+	-del a.out core *.o *.obj *% *~
+	-del libutil.a
+
+PHONY:

@@ -1,0 +1,46 @@
+CFLAGS = $(GLOBALFLAGS) -D_ADD_TRACE2_HEADER_
+
+L = $(EW_HOME)/$(EW_VERSION)/lib
+
+PICKLIB = libebpick.a
+LOCLIB  = libebloc.a
+
+# loc_wcatwc and pick_wcatwc need these
+EB_LIBS = \
+	filters.o \
+	get_pick.o \
+	report.o \
+	ReadStationData.o \
+	geotools.o \
+	mags.o \
+	taulib.o \
+	mjstime.o \
+	diskrw.o
+
+# loc_wcatwc needs these
+EB_LIBS_LOC = \
+	get_hypo.o \
+	locquake.o \
+	logquake.o \
+	dummy.o \
+	littoral.o \
+	fereg.o \
+	display.o \
+	diskrw.o
+
+all: $L/$(PICKLIB) $L/$(LOCLIB)
+
+$L/$(PICKLIB): $(EB_LIBS)
+	ar r $@ $(EB_LIBS)
+
+$L/$(LOCLIB): $(EB_LIBS_LOC)
+	ar r $@ $(EB_LIBS_LOC)
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+	-$(RM) $L/libebpick.a $L/libebpick.lib
+	-$(RM) $L/libebloc.a  $L/libebloc.lib
+
+PHONY:

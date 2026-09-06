@@ -1,0 +1,49 @@
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG = 1
+!ENDIF
+
+!include <Win32.Mak>
+
+CFLAGS  = $(cflags)    $(cdebug) $(cvarsmt)   $(GLOBALFLAGS) \
+		/DWIN32 /I$(NIDAQ_INCLUDE) /wd4005
+LDFLAGS = $(conlflags) $(ldebug) $(conlibsmt)
+
+B = $(EW_HOME)\$(EW_VERSION)\bin
+L = $(EW_HOME)\$(EW_VERSION)\lib
+
+#
+# Set up paths for NI-DAQmx 9.2:
+#
+NIDAQ_INCLUDE = "C:\Program Files\National Instruments\NI-DAQ\DAQmx ANSI C Dev\Include"
+NIDAQ_LIB     = "C:\Program Files\National Instruments\NI-DAQ\DAQmx ANSI C Dev\Lib\msvc"
+
+APP = adsendxs
+
+OBJS = \
+	$(APP).obj \
+	getconfig.obj \
+	heartbeat.obj \
+	errors.obj \
+	port.obj \
+	gps.obj \
+	snw.obj \
+	setpcclock.obj
+
+EW_LIBS = \
+	/LIBPATH:$L \
+	$L\swap.obj \
+	$L\libew_mt.lib
+
+$B\$(APP).exe: $(OBJS)
+	$(link) /out:$@ $(LDFLAGS) $(OBJS) /LIBPATH:$(NIDAQ_LIB) nidaqmx.lib $(EW_LIBS)
+
+
+# Clean-up rules
+clean: PHONY
+	-del a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-del $B\$(APP) $B\$(APP).exe
+
+PHONY:

@@ -1,0 +1,50 @@
+LINUX_FLAGS    = -lm -lpthread
+SOLARIS_FLAGS  = -lm -lnsl -lsocket -lrt -lpthread
+SPECIFIC_FLAGS = $($(PLATFORM)_FLAGS)
+
+CFLAGS   = $(GLOBALFLAGS)
+CXXFLAGS = $(CFLAGS)
+
+B = $(EW_HOME)/$(EW_VERSION)/bin
+
+OBJS = \
+	PSNADBoard.o \
+	AdcBoard.o \
+	Adcv1.o \
+	Adcv2.o \
+	Adcvm.o \
+	AdcSdr24.o \
+	GpsRef.o \
+	GpsRefVco.o \
+	PcRef.o \
+	WwvRef.o \
+	WwvbRef.o
+
+H = PSNADBoard.h Adcv1.h AdcNew.h
+
+libpsn_ew.a: libpsn_ew.a($(OBJS))
+
+PSNADBoard.o:	$H
+AdcBoard.o:	$H
+Adcv1.o:	$H
+Adcv2.o:	$H
+Adcvm.o:	$H
+AdcSdr24.o:	$H
+GpsRef.o:	$H
+GpsRefVco.o:	$H
+PcRef.o:	$H
+WwvRef.o:	$H
+WwvbRef.o:	$H
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+	-$(RM) libpsn_ew.a
+	-$(RM) PSNADBoardEw.lib
+	-$(RM) PSNADBoardEw.exp
+
+clean_bin: PHONY
+	-$(RM) $B/PSNADBoardEw.dll
+
+PHONY:

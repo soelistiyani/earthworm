@@ -1,0 +1,62 @@
+LINUX_FLAGS    = -lm -lpthread
+SOLARIS_FLAGS  = -lm -lnsl -lsocket -lrt -lpthread
+SPECIFIC_FLAGS = $($(PLATFORM)_FLAGS)
+
+CFLAGS = $(GLOBALFLAGS)
+
+B = $(EW_HOME)/$(EW_VERSION)/bin
+L = $(EW_HOME)/$(EW_VERSION)/lib
+
+APP  = ewhtmlemail
+TEST = ge_test
+
+OBJS = \
+	$(APP).o \
+	kml_event.o
+
+EW_LIBS = \
+	$L/butterworth.o \
+	$L/complex_math.o \
+	$L/convertInstResponse.o \
+	$L/decode.o \
+	$L/earthworm_defs.o \
+	$L/encode.o \
+	$L/fleng.o \
+	$L/geo_to_km.o \
+	$L/geom.o \
+	$L/ioc_filter.o \
+	$L/read_arc.o \
+	$L/residue.o \
+	$L/rw_mag.o \
+	$L/site.o \
+	$L/socket_ew.o \
+	$L/socket_ew_common.o \
+	$L/swap.o \
+	$L/transferFunction.o \
+	$L/watchdog_client.o \
+	$L/ws_clientII.o \
+	-L$L -lcrypto -lgd -lew_mt
+
+TEST_LIBS = \
+	$L/decode.o \
+	$L/encode.o \
+	-L$L -lcrypto
+
+all: $B/$(APP) $B/$(TEST)
+
+$B/$(APP): $(OBJS)
+	$(CC) -o $@ $(CFLAGS) $(OBJS) $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+$B/$(TEST): $(TEST).o
+	$(CC) -o $@ $(CFLAGS) $(TEST).o $(TEST_LIBS) $(SPECIFIC_FLAGS)
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-$(RM) $B/$(APP)  $B/$(APP).exe
+	-$(RM) $B/$(TEST) $B/$(TEST).exe
+
+PHONY:

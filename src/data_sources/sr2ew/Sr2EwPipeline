@@ -1,0 +1,192 @@
+#!/bin/bash
+
+# FILE: Sr2EwPipeline ( Example Seismic App Earthworm )
+# COPYRIGHT: (c), Symmetric Research, 2013-2018
+#
+# This batch file shows how to pipe USBxCH data all the way from Blast 
+# to an Earthworm ring in TRACEBUF2 format.  Along the way the pipe utilities 
+# interpolate the data to 100Hz and carry out other tasks.
+#
+# Run from a command prompt or from the Linux File Explorer with 'Run' 
+# but NOT with 'Run in Terminal' as it immediately kills all the child 
+# processes when the terminal exits.
+#
+#
+
+
+# ******************************************************************************
+# Script helper functions.
+# Script helper functions.
+# Script helper functions.
+# ******************************************************************************
+
+# Print syntax error then return.
+
+SyntaxError ()
+{
+        echo 
+        echo "SR2EWPIPELINE.BAT: ERROR, failed INI syntax check, quitting ..."
+        echo
+        SrErrorReturn 1
+}
+
+# Error return, includes a pause.
+
+SrErrorReturn ()
+{
+echo
+echo "SR2EWPIPELINE.BAT: An Error Occurred"
+echo
+echo "This window will go away after 'Press any key to continue' ..."
+echo
+echo "Press enter to continue ..."
+read choice
+echo
+
+exit $1
+}
+
+
+
+# ******************************************************************************
+# Main script starts here.
+# Main script starts here.
+# Main script starts here.
+# ******************************************************************************
+
+clear
+
+# Save path to the current example directory.
+
+EXAMPLEDIR=$PWD
+
+
+SR_TITLE="SR SR2EWPIPELINE.BAT - ( Blast To Earthworm )"
+PATH=.:/usr/local/SR/USBXCH/Exe:"$EXAMPLEDIR":$PATH
+
+
+
+# Announce the program start:
+
+echo "SR2EWPIPELINE.BAT: Starting ..."
+echo
+
+
+
+# Remove any old SrPipe* files so they don't conflict with this run.
+# Not really needed in newly made directory, but essential if directory
+# creation is edited out of this script.
+
+rm -f SrPipe*
+
+
+
+# Set an environment variable with the INI file name.
+#
+# Take the name from the batch command line or use the default.  This
+# one file is shared among all of the pipeline utilities comprising 
+# Sr2EwPipeline.bat and has [sections] for each utility.
+#
+# Currently the default INI file is taken from the Earthworm run_working/params
+# directory.  This assumes the Earthworm environment has already been
+# set by sourcing the ew_linux.bash batch file first.  An alternative would
+# be to have the default INI in this example directory.  To do that, change
+#
+#     INIFILE="$EW_PARAMS/Sr2Ew.ini"
+# to
+#     INIFILE="$EXAMPLEDIR/Sr2Ew.ini"
+#
+#
+
+INIFILE=$1
+if [ "$INIFILE" == "" ] ; then
+        INIFILE="$EW_PARAMS/Sr2Ew.ini"
+fi
+
+
+
+# Check for USBxCH driver and board presence.
+
+echo
+echo "SR2EWPIPELINE.BAT: Checking for USBxCH presence ( SrUsbXch0 ):"
+echo
+
+Presence SrUsbXch0
+
+if [ $? -ge 1 ] ; then SrErrorReturn 1; fi
+echo
+
+
+
+
+# Check the INI syntax:
+#
+# Before actually executing it is best to check the INI syntax.  If there is
+# a syntax error, this batch file terminates.  Fix the error and try again.
+# 
+# Note:
+#
+# These syntax checks are done without /to clause on the utilities.  Because
+# of that the "nextprog" field on the INI reports will be reported as NULL.  See
+# below for the /to clause on each when the utilities are actually run.
+# 
+# 
+
+echo
+echo
+echo
+echo "SR2EWPIPELINE.BAT: Checking INI syntax:"
+echo
+
+Blast /syntax "$INIFILE"
+if [ $? -ge 1 ] ; then SyntaxError; fi
+echo
+
+Pak2Bin /syntax "$INIFILE"
+if [ $? -ge 1 ] ; then SyntaxError; fi
+echo
+
+Interp /syntax "$INIFILE"
+if [ $? -ge 1 ] ; then SyntaxError; fi
+echo
+
+# sr2ew syntax is handled with Earthworm .d processing
+
+
+
+
+# SyntaxGood
+
+echo
+echo "SR2EWPIPELINE.BAT: SUCCESS, INI syntax check passed ..."
+echo
+
+
+
+# Start the pipeline chain in the background.
+#
+# NOTES:
+#
+# * Sampling rates, etc ... are all set in the single INI file
+# * Appending an & is the Linux way of starting a process in the background.
+# * Remember these programs are running in the YMDHMS subdirectory.
+#
+#
+
+echo
+echo
+echo "SR2EWPIPELINE.BAT: Starting the pipeline in the background ..."
+
+     Blast  "$INIFILE"  /to Pak2Bin  &
+   Pak2Bin  "$INIFILE"  /to Interp   &
+    Interp  "$INIFILE"  /to sr2ew    &
+#    sr2ew  this is started by Earthworm startstop
+
+echo "SR2EWPIPELINE.BAT: background pipeline started ... see *.rpt files for info"
+echo
+
+
+
+# Successful return.
+
+exit 0

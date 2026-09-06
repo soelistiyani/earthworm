@@ -1,0 +1,56 @@
+################################################################################
+# moleserv Makefile
+# Includes:
+# 	iriswebreq - A set of functions to retrieve data from a mole db
+# 	mongoose - An embedded web server
+#	odbc - To access the mole mysql database
+#
+# Requires Linux unixODBC{,-devel} packages (brew install unixodbc on Mac OS X)
+#
+# Notes:
+#	Mongoose is compiled with websocket support for future projects
+################################################################################
+
+LINUX_FLAGS    = -lm -lodbc -lpthread
+SOLARIS_FLAGS  = -lm -lodbc -lnsl -lsocket -lrt -lpthread
+SPECIFIC_FLAGS = $($(PLATFORM)_FLAGS)
+
+CFLAGS = $(GLOBALFLAGS) -DUSE_WEBSOCKET
+
+B = $(EW_HOME)/$(EW_VERSION)/bin
+L = $(EW_HOME)/$(EW_VERSION)/lib
+
+APP = moleserv
+
+OBJS = \
+	$(APP).o \
+	iriswebreq.o \
+	mongoose.o \
+	websrequest.o
+
+EW_LIBS = \
+	$L/fleng.o \
+	$L/read_arc.o \
+	$L/rw_mag.o \
+	$L/socket_ew.o \
+	$L/socket_ew_common.o \
+	$L/swap.o \
+	$L/ws_clientII.o \
+	-L$L -lew_mt
+
+$B/$(APP): $(OBJS)
+	$(CC) -o $@ $(CFLAGS) $(OBJS) $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+# To fix unixODBC sql.h DWORD typedef conflict with Earthworm-32 platform.h
+iriswebreq.o: iriswebreq.c
+	$(CC) -c $(CFLAGS) $(CPPFLAGS) -DSIZEOF_LONG_INT=8 $<
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-$(RM) $B/$(APP) $B/$(APP).exe
+
+PHONY:

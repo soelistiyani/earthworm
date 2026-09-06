@@ -1,0 +1,47 @@
+LINUX_FLAGS    = -lm -lpthread
+SOLARIS_FLAGS  = -lm -lrt -lpthread
+SPECIFIC_FLAGS = $($(PLATFORM)_FLAGS)
+
+CFLAGS = $(GLOBALFLAGS) -I..
+
+B = $(EW_HOME)/$(EW_VERSION)/bin
+L = $(EW_HOME)/$(EW_VERSION)/lib
+
+all : $B/picker_func_test $B/picker_func_test_memory
+
+OBJS_PICK = FilterPicker5.o FilterPicker5_Memory.o PickData.o
+
+FilterPicker5.o: FilterPicker5.h FilterPicker5.c FilterPicker5_Memory.o PickData.o
+FilterPicker5_Memory.o: FilterPicker5_Memory.h FilterPicker5_Memory.c
+PickData.o: PickData.h PickData.c
+
+# --------------------------------------------------------------------------
+# picker_func_test_memory
+#
+OBJ_TEST1 = picker_func_test_memory.o $(OBJS_PICK)
+picker_func_test_memory: $B/picker_func_test_memory
+picker_func_test_memory.o: picker_func_test_memory.c FilterPicker5.o
+$B/picker_func_test_memory: $(OBJ_TEST1)
+	$(CC) -o $@ $(OBJ_TEST1) $(CFLAGS) $(SPECIFIC_FLAGS)
+# --------------------------------------------------------------------------
+
+# --------------------------------------------------------------------------
+# picker_func_test
+#
+OBJ_TEST2 = picker_func_test.o $(OBJS_PICK)
+picker_func_test: $B/picker_func_test
+picker_func_test.o: picker_func_test.c FilterPicker5.o
+$B/picker_func_test: $(OBJ_TEST2)
+	$(CC) -o $@ $(OBJ_TEST2) $(CFLAGS) $(SPECIFIC_FLAGS)
+# --------------------------------------------------------------------------
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-$(RM) $B/picker_func_test_memory $B/picker_func_test_memory.exe
+	-$(RM) $B/picker_func_test        $B/picker_func_test.exe
+
+PHONY:

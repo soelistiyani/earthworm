@@ -1,0 +1,59 @@
+In order to display a time as local for a given location:
+
+A python program (utc2localtime.py) is used, which requires the installation of 
+2 modules:
+
+    timezonefinder  (https://pypi.python.org/pypi/timezonefinder)
+    pytz            (https://pypi.python.org/pypi/pytz)
+
+You also need to provide the PathToPython (which is a path, to the installed 
+version of Python to use) as well as the PathToLocaltime (which is a path to the 
+utc2localtime.py file) commands in this module's .d file; relative paths can
+be used, but must be relative to the EW params directory.
+
+For example, suppose an event that occurred on June 6, 2017 @ 11:41:06 UTC, at 
+latitude 39.9683 and longitude -119.6542.  To compute that time local to that
+location (assuming `python` is in your PATH and `utc2localtime.py` is in your cwd):
+
+    python utc2localtime.py -119.6542 39.9683 2017.06.06 11:41:06
+
+This will print the following:
+
+    2017.06.06 04:41:06 -0700 PDT
+
+-----
+
+In order to include estimated PGA values:
+
+Unzipping the file GmpeGmm.zip produces a folder named GmpeGmm, which contains a 
+Java program (and necessary libraries).  This folder must be put somewhere this
+module has access to.
+
+You also need to provide the path to that directory as the argument to the 
+ReportEstimatedPGAs command in this module's  .d file; a relative path can
+be used, but it must be relative to the EW params directory.  As it is a Java program, 
+Java must be installed.
+
+This has been tested w/ Java version 1.8.0_121-b13.
+
+The result is a PGA value measured in "g". 1g = 9.80 m/s/s
+
+
+Usage:
+java -cp GmpeGmm.jar com.isti.gmpegmm.DeterministicSpectra "site name" siteLon siteLat eqMag eqLon eqLat eqDepth
+
+
+Here is an example on a Mac OS X using Java 1.8:
+
+pauls-MacBook-Air-3:gmewhtmlemail paulf$ unzip GmpeGmm.zip 
+Archive:  GmpeGmm.zip
+   creating: lib/
+  inflating: GmpeGmm.jar             
+  inflating: lib/logging.properties  
+  inflating: lib/nshmp-haz.jar       
+
+The magnitude is 3.8, first info is related to site location (longitude then latitude), then earthquake longitude and latitude and depth:
+
+pauls-MacBook-Air-3:gmewhtmlemail paulf$ java -cp GmpeGmm.jar com.isti.gmpegmm.DeterministicSpectra "LOVEWELL DAM" -98.02682535 39.89020137 3.8 -98.111 39.766 5.0
+0.051632
+pauls-MacBook-Air-3:gmewhtmlemail paulf$ 

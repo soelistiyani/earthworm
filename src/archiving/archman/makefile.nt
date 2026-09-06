@@ -1,0 +1,57 @@
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG = 1
+!ENDIF
+
+!include <Win32.Mak>
+
+# added -D_NTSDK to enable definition of getpid() as _getpid() LDD.
+CFLAGS  = $(cflags)    $(cdebug) $(cvarsmt)   $(GLOBALFLAGS) \
+		/Ilibbgs /D_NTSDK /wd4996
+LDFLAGS = $(conlflags) $(ldebug) $(conlibsmt)
+
+B = $(EW_HOME)\$(EW_VERSION)\bin
+L = $(EW_HOME)\$(EW_VERSION)\lib
+
+APP = archman
+
+OBJS = \
+	$(APP).obj \
+	strptime_win.obj
+
+EW_LIBS = \
+	/LIBPATH:$L \
+	socket_ew.obj \
+	socket_ew_common.obj \
+	swap.obj \
+	libbgs.lib \
+	libew_mt.lib
+
+$B\$(APP).exe: $(OBJS) $L\libbgs.lib
+	$(link) /out:$@ $(LDFLAGS) $(OBJS) $(EW_LIBS)
+
+$L\libbgs.lib:
+	@pushd libbgs & \
+		echo ---------- & \
+		for /f "delims=" %d in ( 'cd' ) do @echo Making $(@F) in: %d & \
+		$(MAKE) /$(MAKEFLAGS) /f makefile.nt & \
+	popd
+
+
+# Clean-up rules
+clean:	clean\archman \
+	clean\libbgs
+
+clean\archman: PHONY
+	-del a.out core *.o *.obj *% *~
+
+clean\libbgs: PHONY
+	-@pushd libbgs & \
+		for /f "delims=" %d in ( 'cd' ) do @echo Cleaning in: %d & \
+		$(MAKE) /$(MAKEFLAGS) /f makefile.nt clean & \
+	popd
+
+clean_bin: PHONY
+	-del $B\$(APP) $B\$(APP).exe
+
+PHONY:

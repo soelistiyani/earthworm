@@ -1,0 +1,19 @@
+#
+# Dummy makefile - only used for cleaning things up
+#
+
+B = $(EW_HOME)/$(EW_VERSION)/bin
+
+APP = cleandir
+
+$B/$(APP): FAIL
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-$(RM) $B/$(APP) $B/$(APP).exe
+
+PHONY:

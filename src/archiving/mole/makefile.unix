@@ -1,0 +1,64 @@
+#
+#    Makefile for mysql-connector-c and ew2moledb - Unix version
+#
+#    Requires also 'cmake'
+#
+
+MYSQL_CONNECTOR_C_PATH_BUILD = ../mysql-connector-c-build
+
+all: mysql_connector_c ew2moledb warning_message
+
+mysql_connector_c:
+	@( ls mysql-connector-c-build/lib/libmysql.* > /dev/null 2>&1 ) || \
+	 ( cd mysql-connector-c-6.0.2 && \
+		echo Making mysql-connector-c in: `pwd` ; \
+		$(RM) CMakeCache.txt ; \
+		mkdir -p $(MYSQL_CONNECTOR_C_PATH_BUILD) ; \
+		cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=$(MYSQL_CONNECTOR_C_PATH_BUILD) ; \
+		$(MAKE) ; \
+		$(MAKE) install \
+	 );
+
+ew2moledb:
+	cd $@ && \
+		echo Making $@ in: `pwd` ; \
+		$(MAKE) -f makefile.unix
+
+warning_message:
+	@echo ""
+	@echo "========================================================================"
+	@echo "WARNING: Set the variable LD_LIBRARY_PATH (or DYLD_LIBRARY_PATH), i.e.:"
+	@echo "     export LD_LIBRARY_PATH=`pwd`/mysql-connector-c-build/lib"
+	@echo "     setenv LD_LIBRARY_PATH `pwd`/mysql-connector-c-build/lib"
+	@echo ""
+	@echo "     On Mac OS X you must set the variable DYLD_LIBRARY_PATH"
+	@echo "========================================================================"
+	@echo ""
+
+
+# Clean-up rules
+clean:	clean/here \
+	clean/ew2moledb
+
+clean/here: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+
+clean/ew2moledb: PHONY
+	-@cd $(@F) && \
+		echo Cleaning in: `pwd` ; \
+		$(MAKE) -f makefile.unix clean
+
+clean_bin: \
+	clean_bin/here \
+	clean_bin/ew2moledb
+
+clean_bin/here: PHONY
+	-$(RM) mysql-connector-c-6.0.2/CMakeCache.txt
+	-$(RM) -r $(MYSQL_CONNECTOR_C_PATH_BUILD)/*
+
+clean_bin/ew2moledb: PHONY
+	-@cd $(@F) && \
+		echo Cleaning binaries in: `pwd` ; \
+		$(MAKE) -f makefile.unix clean_bin
+
+PHONY:

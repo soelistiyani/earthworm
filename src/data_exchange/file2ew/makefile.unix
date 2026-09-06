@@ -1,0 +1,60 @@
+LINUX_FLAGS    = -lm -lpthread
+SOLARIS_FLAGS  = -lm -lrt -lpthread
+SPECIFIC_FLAGS = $($(PLATFORM)_FLAGS)
+
+B = $(EW_HOME)/$(EW_VERSION)/bin
+L = $(EW_HOME)/$(EW_VERSION)/lib
+
+CFLAGS = $(GLOBALFLAGS)
+
+OBJS = file2ew.o
+
+OBJS_SM = \
+	$(OBJS) \
+	$L/rw_strongmotionII.o
+
+EW_LIBS = \
+	$L/dirops_ew.o \
+	$L/k2evt2ew.o \
+	$L/swap.o \
+	-L$L -lew_mt
+
+all:	$B/file2ew \
+	$B/sm_csmip2ew \
+	$B/sm_nsmp2ew \
+	$B/sm_redi2ew \
+	$B/sm_terra2ew \
+	$B/sm_tremor2ew
+
+$B/file2ew: $(OBJS) raw2ew.o
+	$(CC) -o $@ $(CFLAGS) $(OBJS) raw2ew.o $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+$B/sm_csmip2ew: $(OBJS_SM) csmip2ew.o
+	$(CC) -o $@ $(CFLAGS) $(OBJS_SM) csmip2ew.o $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+$B/sm_nsmp2ew: $(OBJS_SM) nsmp2ew.o
+	$(CC) -o $@ $(CFLAGS) $(OBJS_SM) nsmp2ew.o $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+$B/sm_redi2ew: $(OBJS_SM) redi2ew.o
+	$(CC) -o $@ $(CFLAGS) $(OBJS_SM) redi2ew.o $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+$B/sm_terra2ew: $(OBJS_SM) terra2ew.o
+	$(CC) -o $@ $(CFLAGS) $(OBJS_SM) terra2ew.o $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+$B/sm_tremor2ew: $(OBJS_SM) tremor2ew.o
+	$(CC) -o $@ $(CFLAGS) $(OBJS_SM) tremor2ew.o $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-$(RM) $B/file2ew      $B/file2ew.exe
+	-$(RM) $B/sm_csmip2ew  $B/sm_csmip2ew.exe
+	-$(RM) $B/sm_nsmp2ew   $B/sm_nsmp2ew.exe
+	-$(RM) $B/sm_redi2ew   $B/sm_redi2ew.exe
+	-$(RM) $B/sm_terra2ew  $B/sm_terra2ew.exe
+	-$(RM) $B/sm_tremor2ew $B/sm_tremor2ew.exe
+
+PHONY:

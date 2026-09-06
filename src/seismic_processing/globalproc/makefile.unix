@@ -1,0 +1,47 @@
+LINUX_FLAGS    = -lm -lpthread
+SOLARIS_FLAGS  = -lm -lrt -lpthread
+SPECIFIC_FLAGS = $($(PLATFORM)_FLAGS)
+
+CFLAGS = $(GLOBALFLAGS)
+
+B = $(EW_HOME)/$(EW_VERSION)/bin
+L = $(EW_HOME)/$(EW_VERSION)/lib
+
+APP = globalproc
+
+OLSRC = $(EW_HOME)/$(EW_VERSION)/src/seismic_processing/geqproc
+
+OBJS = \
+	$(APP).o \
+	init_ewevent.o
+
+EW_LIBS = \
+	$L/brent.o \
+	$L/dirops_ew.o \
+	$L/geo_to_km.o \
+	$L/global_amp_rw.o \
+	$L/global_loc_rw.o \
+	$L/global_msg.o \
+	$L/global_pick_rw.o \
+	$L/mnbrak.o \
+	$L/site.o \
+	$L/swap.o \
+	$L/tlay.o \
+	$L/watchdog_client.o \
+	-L$L -lew_mt
+
+$B/$(APP): $(OBJS)
+	$(CC) -o $@ $(CFLAGS) $(OBJS) $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+init_ewevent.o:
+	$(CC) -c $(CFLAGS) $(CPPFLAGS) $(OLSRC)/init_ewevent.c
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-$(RM) $B/$(APP) $B/$(APP).exe
+
+PHONY:

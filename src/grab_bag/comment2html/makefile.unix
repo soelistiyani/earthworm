@@ -1,0 +1,37 @@
+LINUX_FLAGS    = -lpthread
+SOLARIS_FLAGS  = -lrt -lpthread
+SPECIFIC_FLAGS = $($(PLATFORM)_FLAGS)
+
+CFLAGS = $(GLOBALFLAGS)
+
+B = $(EW_HOME)/$(EW_VERSION)/bin
+L = $(EW_HOME)/$(EW_VERSION)/lib
+
+APP = comment2html
+
+OBJS = \
+	$(APP).o \
+	api_doc_util.o \
+	parse_files_for_keywords.o \
+	write_comment_file.o \
+	write_html_comments.o \
+	write_html_file.o
+
+EW_LIBS = \
+	$L/dirops_ew.o \
+	$L/logit_mt.o \
+	$L/time_ew.o \
+	-L$L -lew_mt
+
+$B/$(APP): $(OBJS)
+	$(CC) -o $@ $(CFLAGS) $(OBJS) $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-$(RM) $B/$(APP) $B/$(APP).exe
+
+PHONY:

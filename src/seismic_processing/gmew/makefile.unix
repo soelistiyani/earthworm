@@ -1,0 +1,66 @@
+LINUX_FLAGS    = -lm -lpthread
+SOLARIS_FLAGS  = -lm -lnsl -lsocket -lrt -lpthread
+SPECIFIC_FLAGS = $($(PLATFORM)_FLAGS)
+
+CFLAGS = $(GLOBALFLAGS)
+
+B = $(EW_HOME)/$(EW_VERSION)/bin
+L = $(EW_HOME)/$(EW_VERSION)/lib
+
+APP = gmew
+
+OBJS = \
+	$(APP).o \
+	gm_config.o \
+	gm_util.o \
+	gm_sac.o \
+	gm_ws.o \
+	gm_xml.o \
+	lm_misc.o \
+	lm_site.o
+
+EW_LIBS = \
+	$L/brent.o \
+	$L/dirops_ew.o \
+	$L/ew_spectra_io.o \
+	$L/fft_prep.o \
+	$L/fft99.o \
+	$L/gma.o \
+	$L/mem_circ_queue.o \
+	$L/mnbrak.o \
+	$L/parse_ip_address.o \
+	$L/read_arc.o \
+	$L/rw_strongmotionII.o \
+	$L/socket_ew.o \
+	$L/socket_ew_common.o \
+	$L/swap.o \
+	$L/tlay.o \
+	$L/transfer.o \
+	$L/ws_clientII.o \
+	-L$L -lew_mt
+
+all:	$B/$(APP) \
+	$B/compute_gm
+
+$B/$(APP): $(OBJS)
+	$(CC) -o $@ $(CFLAGS) $(OBJS) $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+$B/compute_gm: compute_gm.o
+	$(CC) -o $@ $(CFLAGS) compute_gm.o $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+lm_site.o: ../localmag/lm_site.c
+	$(CC) -c $(CFLAGS) $(CPPFLAGS) ../localmag/lm_site.c
+
+lm_misc.o: ../localmag/lm_misc.c
+	$(CC) -c $(CFLAGS) $(CPPFLAGS) ../localmag/lm_misc.c
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-$(RM) $B/$(APP)     $B/$(APP).exe
+	-$(RM) $B/compute_gm $B/compute_gm.exe
+
+PHONY:

@@ -1,0 +1,24 @@
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG = 1
+!ENDIF
+
+!include <Win32.Mak>
+
+CFLAGS  = $(cflags)    $(cdebug) $(cvarsmt)   $(GLOBALFLAGS)
+
+L = $(EW_HOME)\$(EW_VERSION)\lib
+
+OBJS = \
+	decode.obj \
+	encode.obj
+
+objs: $(OBJS)
+	copy *.obj $L
+
+
+# Clean-up rules
+clean: PHONY
+	-del a.out core *.o *.obj *% *~
+
+PHONY:

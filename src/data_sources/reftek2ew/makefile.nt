@@ -1,0 +1,71 @@
+# @(#)makefile.sol	1.3 07/01/98
+# USGS style makefile for reftek2ew
+#
+# This makefile requires that the Reftek RTP libraries already exist
+# on your system.  If you don't have it, get it from
+#
+#        ftp://ftp.reftek.com:/pub/rtp
+#
+# and follow the directions therein to build the library.  Specify the
+# directory containing the libraries and include files as shown:
+
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG = 1
+!ENDIF
+
+!include <Win32.Mak>
+
+CFLAGS  = $(cflags)    $(cdebug) $(cvarsmt)   $(GLOBALFLAGS)
+LDFLAGS = $(conlflags) $(ldebug) $(conlibsmt)
+
+B = $(EW_HOME)\$(EW_VERSION)\bin
+L = $(EW_HOME)\$(EW_VERSION)\lib
+
+RTP_DIR = lib
+
+APP = reftek2ew
+
+OBJS = \
+	main.obj \
+	hbeat.obj \
+	init.obj \
+	notify.obj \
+	params.obj \
+	samprate.obj \
+	scn.obj \
+	send.obj \
+	terminate.obj
+
+RTP_LIB = /LIBPATH:$(RTP_DIR) libreftek.lib libutil.lib librtp.lib
+
+EW_LIBS = /LIBPATH:$L libew_mt.lib
+
+$B\$(APP).exe: $(OBJS) libs
+	$(link) /out:$@ $(LDFLAGS) $(RTP_LIB) $(OBJS) $(EW_LIBS)
+
+libs: $(RTP_DIR)\libreftek.lib $(RTP_DIR)\libutil.lib $(RTP_DIR)\librtp.lib
+	@pushd $(RTP_DIR) & \
+		echo ---------- & \
+		for /f "delims=" %d in ( 'cd' ) do @echo Making $@ in: %d & \
+		$(MAKE) /$(MAKEFLAGS) /f makefile.nt & \
+	popd
+
+
+# Clean-up rules
+clean:	clean\here \
+	clean\lib
+
+clean\here: PHONY
+	-del a.out core *.o *.obj *% *~
+
+clean\lib: PHONY
+	-@pushd $(RTP_DIR) & \
+		for /f "delims=" %d in ( 'cd' ) do @echo Cleaning in: %d & \
+		$(MAKE) /$(MAKEFLAGS) /f makefile.nt clean & \
+	popd
+
+clean_bin: PHONY
+	-del $B\$(APP) $B\$(APP).exe
+
+PHONY:

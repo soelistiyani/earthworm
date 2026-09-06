@@ -1,0 +1,98 @@
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG = 1
+!ENDIF
+
+!include <Win32.Mak>
+
+CFLAGS  = $(cflags)    $(cdebug) $(cvarsmt)   $(GLOBALFLAGS)
+LDFLAGS = $(conlflags) $(ldebug) $(conlibsmt)
+
+B = $(EW_HOME)\$(EW_VERSION)\bin
+L = $(EW_HOME)\$(EW_VERSION)\lib
+
+APP = rayloc_ew
+
+OBJS = \
+	rayloc_ew_main.obj \
+	rayloc_ew_config.obj
+
+F_SRCS = \
+	hypo.f \
+	distaz.f \
+	ellip.f \
+	input.f \
+	libsun.f \
+	io_util.f \
+	libtau.f \
+	output.f \
+	robust_util.f
+
+F_STUB = \
+	libray_wrapper.f90 \
+	librayloc1.f
+
+EW_LIBS = \
+	/LIBPATH:$L \
+	earthworm_defs.obj \
+	global_msg.obj \
+	global_loc_rw.obj \
+	rayloc_message_rw.obj \
+	swap.obj \
+	libew_mt.lib
+
+F_MAIN      = raylocator.f
+C_MAIN1_SRC = rayloc_test1.c
+C_MAIN1     = $(C_MAIN1_SRC:.c=.obj)
+C_MAIN2_SRC = rayloc_test2.c
+C_MAIN2     = $(C_MAIN2_SRC:.c=.obj)
+C_SRCS = \
+	rayloc_stations.c \
+	rayloc_unused_phases.c \
+	rayloc1.c
+C_OBJS = $(C_SRCS:.c=.obj)
+
+SPECIFIC_FLAGS = \
+	/NODEFAULTLIB:libc \
+	/DEFAULTLIB:libifcoremt \
+	/NODEFAULTLIB:libifcore \
+	/DEFAULTLIB:libmmt
+
+PROGS =	$B\rayloc_ew.exe \
+	# $B\rayloc_test1.exe \
+	# $B\rayloc_test2.exe \
+	# $B\rayloc_test3.exe
+
+########################################################################
+
+all: $(PROGS)
+
+$B\$(APP).exe: $(OBJS) $(F_SRCS) $(F_STUB) $(C_OBJS)
+	$(FC) /exe:$@ $(FFLAGS) $(OBJS) $(F_SRCS) $(F_STUB) $(C_OBJS) $(EW_LIBS) \
+		/link $(SPECIFIC_FLAGS)
+
+$B\rayloc_test1.exe: $(F_MAIN) $(F_SRCS)
+	$(FC) /exe:$@ $(FFLAGS) $(F_MAIN) $(F_SRCS)
+
+$B\rayloc_test2.exe: $(C_MAIN1) $(F_SRCS) $(F_STUB) $(C_OBJS)
+	$(FC) /exe:$@ $(FFLAGS) $(C_MAIN1) $(F_SRCS) $(F_STUB) $(C_OBJS) $L\kom.o
+
+$B\rayloc_test3.exe: $(C_MAIN2) $(F_SRCS) $(F_STUB) $(C_OBJS)
+	$(FC) /exe:$@ $(FFLAGS) $(C_MAIN2) $(F_SRCS) $(F_STUB) $(C_OBJS) $L\kom.o
+
+
+# Clean-up rules
+clean: PHONY
+	-del a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-del $B\$(APP)       $B\$(APP).exe
+	-del $B\rayloc_test1 $B\rayloc_test1.exe
+	-del $B\rayloc_test2 $B\rayloc_test2.exe
+	-del $B\rayloc_test3 $B\rayloc_test3.exe
+	-rmdir /S /Q $B\$(APP).dSYM
+	-rmdir /S /Q $B\rayloc_test1.dSYM
+	-rmdir /S /Q $B\rayloc_test2.dSYM
+	-rmdir /S /Q $B\rayloc_test3.dSYM
+
+PHONY:

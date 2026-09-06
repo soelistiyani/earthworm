@@ -1,0 +1,52 @@
+LINUX_FLAGS    = -lm -lpthread
+SOLARIS_FLAGS  = -lm -lnsl -lsocket -lrt -lpthread
+SPECIFIC_FLAGS = $($(PLATFORM)_FLAGS)
+
+CFLAGS = $(GLOBALFLAGS)
+
+B = $(EW_HOME)/$(EW_VERSION)/bin
+L = $(EW_HOME)/$(EW_VERSION)/lib
+
+APP = ewspectra
+
+OBJS = \
+	ewspectra.o \
+	iir.o
+
+OBJSa = activate_module.o
+
+OBJSs = sniffspectra.o
+
+EW_LIBS = \
+	$L/ew_spectra_io.o \
+	$L/mem_circ_queue.o \
+	$L/socket_ew.o \
+	$L/socket_ew_common.o \
+	$L/swap.o \
+	$L/ws_clientII.o \
+	-L$L -lew_mt
+
+all:	$B/$(APP) \
+	$B/activate_module \
+	$B/sniffspectra
+
+$B/$(APP): $(OBJS)
+	$(CC) -o $@ $(CFLAGS) $(OBJS) $L/ws2ts.o $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+$B/activate_module: $(OBJSa)
+	$(CC) -o $@ $(CFLAGS) $(OBJSa) $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+$B/sniffspectra: $(OBJSs)
+	$(CC) -o $@ $(CFLAGS) $(OBJSs) $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-$(RM) $B/$(APP)          $B/$(APP).exe
+	-$(RM) $B/activate_module $B/activate_module.exe
+	-$(RM) $B/sniffspectra    $B/sniffspectra.exe
+
+PHONY:

@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# FILE: KillSr2EwPipeline
+# COPYRIGHT: (c), Symmetric Research, 2015-2018
+#
+# Terminate all utilities in the "SR to EW Pipeline" program chain.
+#
+#
+
+echo "Killing the 'SR to EW Pipeline' utilities ( Blast, Pak2Bin, Interp, sr2ew ) ..."
+
+#     sr2ew killed by Earthworm startstop
+pkill Interp
+pkill Pak2Bin
+pkill Blast
+
+echo
+echo "Run ps -aux to verify all SR utilities are gone."
+echo
+
+echo "Press enter to continue to command prompt ..."
+read choice
+echo
+
+

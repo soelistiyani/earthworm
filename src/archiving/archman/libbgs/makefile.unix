@@ -1,0 +1,36 @@
+CFLAGS = $(GLOBALFLAGS)
+
+L = $(EW_HOME)/$(EW_VERSION)/lib
+
+OBJS = $(GEOLIB_OBJS) $(EW_OBJS)
+
+# list of objects for code that came from GEOLIB library
+GEOLIB_OBJS = \
+	add_clk.o \
+	alloc.o \
+	chk_clk.o \
+	chk_num.o \
+	copy_file.o \
+	date_dy.o \
+	diff_clk.o \
+	dy_date.o \
+	dy_in_mn.o \
+	is_leap.o \
+	network.o \
+	string.o \
+	subst_var.o
+
+# list of objects created especially for Earthworm
+EW_OBJS = \
+	utils.o \
+	utils_sol.o
+
+$L/libbgs.a: $L/libbgs.a($(OBJS))
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+	-$(RM) $L/libbgs.a
+
+PHONY:

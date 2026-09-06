@@ -1,0 +1,50 @@
+LINUX_FLAGS    = -lm -lpthread
+SOLARIS_FLAGS  = -lm -lrt -lpthread
+SPECIFIC_FLAGS = $($(PLATFORM)_FLAGS)
+
+CFLAGS = $(GLOBALFLAGS)
+
+B = $(EW_HOME)/$(EW_VERSION)/bin
+L = $(EW_HOME)/$(EW_VERSION)/lib
+
+APP1 = scn2scnl
+APP2 = scnl2scn
+
+OBJ1 = \
+	$(APP1).o \
+	scn_config.o \
+	scn_convert.o \
+	to_coda_scnl.o \
+	to_pick_scnl.o \
+	to_trace_scnl.o
+OBJ2 = \
+	$(APP2).o \
+	scnl_config.o \
+	scnl_convert.o \
+	to_coda2k.o \
+	to_pick2k.o \
+	to_trace_scn.o
+
+EW_LIBS = \
+	$L/rdpickcoda.o \
+	-L$L -lew_mt
+
+all:	$B/$(APP1) \
+	$B/$(APP2)
+
+$B/$(APP1): $(OBJ1)
+	$(CC) -o $@ $(CFLAGS) $(OBJ1) $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+$B/$(APP2): $(OBJ2)
+	$(CC) -o $@ $(CFLAGS) $(OBJ2) $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-$(RM) $B/$(APP1) $B/$(APP1).exe
+	-$(RM) $B/$(APP2) $B/$(APP2).exe
+
+PHONY:

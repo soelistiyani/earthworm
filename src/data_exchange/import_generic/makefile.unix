@@ -1,0 +1,35 @@
+LINUX_FLAGS    = -lpthread
+SOLARIS_FLAGS  = -lnsl -lsocket -lrt -lpthread
+SPECIFIC_FLAGS = $($(PLATFORM)_FLAGS)
+
+CFLAGS = $(GLOBALFLAGS)
+
+B = $(EW_HOME)/$(EW_VERSION)/bin
+L = $(EW_HOME)/$(EW_VERSION)/lib
+
+EW_LIBS = \
+	$L/socket_ew.o \
+	$L/socket_ew_common.o \
+	-L$L -lew_mt
+
+#all: $B/import_generic
+all: $B/import_ack
+
+$B/import_generic: import_generic.o
+	$(CC) -o $@ $(CFLAGS) import_generic.o $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+$B/import_ack: import_ack.o
+	$(CC) -o $@ $(CFLAGS) import_ack.o $(EW_LIBS) $(SPECIFIC_FLAGS)
+	$(RM) $B/import_generic
+	ln $B/import_ack $B/import_generic
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-$(RM) $B/import_generic $B/import_generic.exe
+	-$(RM) $B/import_ack     $B/import_ack.exe
+
+PHONY:

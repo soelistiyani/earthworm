@@ -1,0 +1,48 @@
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG = 1
+!ENDIF
+
+!include <Win32.Mak>
+
+CFLAGS  = $(cflags)    $(cdebug) $(cvarsmt)   $(GLOBALFLAGS)
+LDFLAGS = $(conlflags) $(ldebug) $(conlibsmt)
+
+L = $(EW_HOME)\$(EW_VERSION)\lib
+B = $(EW_HOME)\$(EW_VERSION)\bin
+
+APP1 = ew_nevent_test_sender
+APP2 = ew_nevent_test_receiver
+
+OBJS1 = $(APP1).obj
+OBJS2 = $(APP2).obj
+
+EW_LIBS = \
+	/LIBPATH:$L \
+	ew_nevent_message.obj \
+	lockfile.obj \
+	lockfile_ew.obj \
+	sema_ew.obj \
+	service_ew.obj \
+	startstop_lib.obj \
+	startstop_winlib.obj \
+	libew_mt.lib
+
+all: $B\$(APP1).exe $B\$(APP2).exe
+
+$B\$(APP1).exe: $(OBJS1)
+	$(link) /out:$@ $(LDFLAGS) $(OBJS1) $(EW_LIBS)
+
+$B\$(APP2).exe: $(OBJS2)
+	$(link) /out:$@ $(LDFLAGS) $(OBJS2) $(EW_LIBS)
+
+
+# Clean-up rules
+clean: PHONY
+	-del a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-del $B\$(APP1) $B\$(APP1).exe
+	-del $B\$(APP2) $B\$(APP2).exe
+
+PHONY:

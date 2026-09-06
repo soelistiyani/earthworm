@@ -1,0 +1,47 @@
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG = 1
+!ENDIF
+
+!include <Win32.Mak>
+
+CFLAGS  = $(cflags)    $(cdebug) $(cvarsmt)   $(GLOBALFLAGS)
+LDFLAGS = $(conlflags) $(ldebug) $(conlibsmt)
+
+B = $(EW_HOME)\$(EW_VERSION)\bin
+L = $(EW_HOME)\$(EW_VERSION)\lib
+
+APP = eqproc
+
+OBJS = $(APP).obj
+
+EW_LIBS = \
+	/LIBPATH:$L \
+	brent.obj \
+	mnbrak.obj \
+	pipe.obj \
+	rdpickcoda.obj \
+	site.obj \
+	tlay.obj \
+	libew_mt.lib
+
+all:	$B\$(APP).exe \
+	$B\log_everything.exe
+
+$B\$(APP).exe: $(OBJS)
+	$(link) /out:$@ $(LDFLAGS) $(OBJS) $(EW_LIBS)
+
+$B\log_everything.exe: log_everything.obj
+	$(link) /out:$@ $(LDFLAGS) log_everything.obj \
+		/LIBPATH:$L pipe.obj libew_mt.lib
+
+
+# Clean-up rules
+clean: PHONY
+	-del a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-del $B\$(APP)         $B\$(APP).exe
+	-del $B\log_everything $B\log_everything.exe
+
+PHONY:

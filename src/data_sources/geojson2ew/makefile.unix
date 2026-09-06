@@ -1,0 +1,50 @@
+# Requires Jansson (http://www.digip.org/jansson)
+# See https://jansson.readthedocs.io/en/2.1/gettingstarted.html
+
+# On Red Hat/CentOS:
+#    yum install jansson-devel.{i686,x86_64}
+#    yum install librabbitmq-devel.{i686,x86_64}
+
+# If json_conn.c:533: error: incompatible type for argument 7 of
+# ‘amqp_exchange_declare’, try -DSOCKET_ONLY
+
+LINUX_FLAGS    = -lpthread
+SOLARIS_FLAGS  = -lnsl -lsocket -lrt -lpthread
+SPECIFIC_FLAGS = $($(PLATFORM)_FLAGS) -lrabbitmq -ljansson
+
+CFLAGS = $(GLOBALFLAGS) -O
+
+B = $(EW_HOME)/$(EW_VERSION)/bin
+L = $(EW_HOME)/$(EW_VERSION)/lib
+
+APP = geojson2ew
+
+OBJS = \
+	main.o \
+	die.o \
+	geojson_map.o \
+	geojson_process.o \
+	getconfig.o \
+	heart.o \
+	json_conn.o \
+	logo.o \
+	options.o
+
+EW_LIBS = \
+	$L/logit_mt.o \
+	$L/socket_ew.o \
+	$L/socket_ew_common.o \
+	-L$L -lew_mt
+
+$B/$(APP): $(OBJS)
+	$(CC) -o $@ $(CFLAGS) $(OBJS) $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-$(RM) $B/$(APP) $B/$(APP).exe
+
+PHONY:

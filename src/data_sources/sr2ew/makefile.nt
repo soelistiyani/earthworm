@@ -1,0 +1,43 @@
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG = 1
+!ENDIF
+
+!include <Win32.Mak>
+
+CFLAGS  = $(cflags)    $(cdebug) $(cvarsmt)   $(GLOBALFLAGS) /DSROS_WINDOWS
+LDFLAGS = $(conlflags) $(ldebug) $(conlibsmt)
+
+B = $(EW_HOME)\$(EW_VERSION)\bin
+L = $(EW_HOME)\$(EW_VERSION)\lib
+
+SR_HOME = $(EW_HOME)\$(EW_VERSION)\src\data_sources\sr2ew
+
+APP = sr2ew
+
+OBJS = \
+	$(APP).obj \
+	CustomPipeLib_win.obj
+
+EW_LIBS = \
+	/LIBPATH:$L \
+	getutil.obj \
+	kom.obj \
+	logit_mt.obj \
+	sleep_ew.obj \
+	time_ew.obj \
+	transport.obj \
+	libew_mt.lib
+
+$B\$(APP).exe: $(OBJS)
+	$(link) /out:$@ $(LDFLAGS) $(OBJS) $(EW_LIBS)
+
+
+# Clean-up rules
+clean: PHONY
+	-del a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-del $B\$(APP) $B\$(APP).exe
+
+PHONY:

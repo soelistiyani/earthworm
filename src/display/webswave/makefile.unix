@@ -1,0 +1,48 @@
+LINUX_FLAGS    = -lm -ldl -lpthread
+SOLARIS_FLAGS  = -lm -ldl -lnsl -lsocket -lrt -lpthread
+SPECIFIC_FLAGS = $($(PLATFORM)_FLAGS)
+
+CFLAGS = $(GLOBALFLAGS) $(WEBPAGE) -DUSE_WEBSOCKET
+
+HTML = $(APP).html
+
+WEBPAGE = -D_HTMLVAR=$(APP)_html_gz -D_HTMLVARLEN=$(APP)_html_gz_len
+
+B = $(EW_HOME)/$(EW_VERSION)/bin
+L = $(EW_HOME)/$(EW_VERSION)/lib
+
+APP = webswave
+
+OBJS = \
+	$(APP).o \
+	mongoose.o
+
+EW_LIBS = \
+	$L/fleng.o \
+	$L/rdpickcoda.o \
+	$L/rw_mag.o \
+	$L/site.o \
+	$L/socket_ew.o \
+	$L/socket_ew_common.o \
+	$L/swap.o \
+	$L/ws_clientII.o \
+	-L$L -lew_mt
+
+$B/$(APP): $(OBJS)
+	$(CC) -o $@ $(CFLAGS) $(OBJS) $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+$(APP).o: $(APP).c webpage.h
+
+webpage.h: $(HTML)
+	gzip -c $(HTML) > $(HTML).gz  # Create gzip file
+	xxd -i $(HTML).gz > webpage.h # Place gzip file in webpage.h
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-$(RM) $B/$(APP) $B/$(APP).exe
+
+PHONY:

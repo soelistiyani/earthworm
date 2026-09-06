@@ -1,0 +1,55 @@
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG = 1
+!ENDIF
+
+!include <Win32.Mak>
+
+CFLAGS   = $(cflags)    $(cdebug) $(cvarsmt)   $(GLOBALFLAGS) \
+		/EHsc /DWIN32 /DWIN32_64
+CPPFLAGS = $(CFLAGS)
+
+B = $(EW_HOME)\$(EW_VERSION)\bin
+
+OBJS = \
+	AdcBoard.obj \
+	AdcSdr24.obj \
+	Adcv1.obj \
+	Adcv2.obj \
+	Adcvm.obj \
+	GpsRef.obj \
+	GpsRefVco.obj \
+	PcRef.obj \
+	PSNADBoard.obj \
+	WwvbRef.obj \
+	WwvRef.obj
+
+H = PSNADBoard.h Adcv1.h AdcNew.h
+
+$B\PSNADBoardEw.dll: $(OBJS)
+	$(link) /nologo /dll /out:$@ /INCREMENTAL:NO /IMPLIB:PSNADBoardEw.lib $(OBJS)
+
+AdcBoard.obj:	AdcBoard.cpp $H
+AdcSdr24.obj:	AdcSdr24.cpp $H
+Adcv1.obj:	Adcv1.cpp $H
+Adcv2.obj:	Adcv2.cpp $H
+Adcvm.obj:	Adcvm.cpp $H
+GpsRef.obj:	GpsRef.cpp $H
+GpsRefVco.obj:	GpsRefVco.cpp $H
+PcRef.obj:	PcRef.cpp $H
+PSNADBoard.obj:	PSNADBoard.cpp $H
+WwvbRef.obj:	WwvbRef.cpp $H
+WwvRef.obj:	WwvRef.cpp $H
+
+
+# Clean-up rules
+clean: PHONY
+	-del a.out core *.o *.obj *% *~
+	-del libpsn_ew.a
+	-del PSNADBoardEw.lib
+	-del PSNADBoardEw.exp
+
+clean_bin: PHONY
+	-del $B\PSNADBoardEw.dll
+
+PHONY:

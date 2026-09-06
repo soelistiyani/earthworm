@@ -1,0 +1,37 @@
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG = 1
+!ENDIF
+
+!include <Win32.Mak>
+
+CFLAGS  = $(cflags)    $(cdebug) $(cvarsmt)   $(GLOBALFLAGS) /I..
+LDFLAGS = $(conlflags) $(ldebug) $(conlibsmt)
+
+B = $(EW_HOME)\$(EW_VERSION)\bin
+L = $(EW_HOME)\$(EW_VERSION)\lib
+
+all:	$B\inspect_tank.exe \
+	$B\read_index.exe \
+	$B\read_struct.exe
+
+$B\inspect_tank.exe: inspect_tank.obj
+	$(link) /out:$@ $(LDFLAGS) inspect_tank.obj
+
+$B\read_index.exe: read_index.obj
+	$(link) /out:$@ $(LDFLAGS) read_index.obj
+
+$B\read_struct.exe: read_struct.obj
+	$(link) /out:$@ $(LDFLAGS) read_struct.obj
+
+
+# Clean-up rules
+clean: PHONY
+	-del a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-del $B\inspect_tank $B\inspect_tank.exe
+	-del $B\read_index   $B\read_index.exe
+	-del $B\read_struct  $B\read_struct.exe
+
+PHONY:

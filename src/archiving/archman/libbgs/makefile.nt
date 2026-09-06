@@ -1,0 +1,44 @@
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG = 1
+!ENDIF
+
+!include <Win32.Mak>
+
+CFLAGS  = $(cflags)    $(cdebug) $(cvarsmt)   $(GLOBALFLAGS)
+
+L = $(EW_HOME)\$(EW_VERSION)\lib
+
+OBJS = $(GEOLIB_OBJS) $(EW_OBJS)
+
+# list of objects for code that came from GEOLIB library
+GEOLIB_OBJS = \
+	add_clk.obj \
+	alloc.obj \
+	chk_clk.obj \
+	chk_num.obj \
+	copy_file.obj \
+	date_dy.obj \
+	diff_clk.obj \
+	dy_date.obj \
+	dy_in_mn.obj \
+	is_leap.obj \
+	network.obj \
+	string.obj \
+	subst_var.obj
+
+# list of objects created especially for Earthworm
+EW_OBJS = \
+	utils.obj \
+	utils_nt.obj
+
+$L\libbgs.lib: $(OBJS)
+	lib /nologo /out:$@ $(OBJS)
+
+
+# Clean-up rules
+clean: PHONY
+	-del a.out core *.o *.obj *% *~
+	-del $L\libbgs.lib
+
+PHONY:

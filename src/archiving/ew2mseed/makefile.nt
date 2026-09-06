@@ -1,0 +1,19 @@
+#
+# Dummy makefile - only used for cleaning things up
+#
+
+B = $(EW_HOME)\$(EW_VERSION)\bin
+
+default: FAIL
+
+
+# Clean-up rules
+clean: PHONY
+	-del a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-del $B\ew2mseed    $B\ew2mseed.exe
+	-del $B\ew2mseed_nl $B\ew2mseed_nl.exe
+	-del $B\wsSniffer   $B\wsSniffer.exe
+
+PHONY:

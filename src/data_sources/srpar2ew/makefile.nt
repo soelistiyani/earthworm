@@ -1,0 +1,62 @@
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG = 1
+!ENDIF
+
+!include <Win32.Mak>
+
+CFLAGS  = $(cflags)    $(cdebug) $(cvarsmt)   $(GLOBALFLAGS)
+LDFLAGS = $(conlflags) $(ldebug) $(conlibsmt)
+
+B = $(EW_HOME)\$(EW_VERSION)\bin
+L = $(EW_HOME)\$(EW_VERSION)\lib
+
+# The following lines set the location of the SR PARxCH and PARGPS
+# library functions needed to compile SrPar2Ew.  Un-comment the
+# first line below when compiling from the Earthworm directory tree
+# and the second when compiling from the SR directory tree.
+
+SR_HOME = $(EW_HOME)\$(EW_VERSION)\src\data_sources\srpar2ew
+#SR_HOME = \SR
+
+PARXCH = $(SR_HOME)\parxch
+PARGPS = $(SR_HOME)\pargps
+
+PARXCHINC = $(PARXCH)\include
+PARGPSINC = $(PARGPS)\include
+PARXCHLIB = $(PARXCH)\lib\parxch.c
+PARGPSLIB = $(PARGPS)\lib\pargps.c
+
+VSDEF = /D_CRT_SECURE_NO_DEPRECATE
+PDEF  = $(VSDEF) /DSROS_WIN2K /DSRA2D_PARANY /DGPS_AVAILABLE
+
+APP = srpar2ew
+
+OBJS = \
+	$(APP).obj \
+	pargps.obj \
+	parxch.obj
+
+EW_LIBS = /LIBPATH:$L libew_mt.lib
+
+$B\$(APP).exe: $(OBJS)
+	$(link) /out:$@ $(LDFLAGS) $(OBJS) $(EW_LIBS)
+
+$(APP).obj: $(APP).c
+	$(CC) $(CFLAGS) $(PDEF) /I$(PARXCHINC) /I$(PARGPSINC) $(APP).c
+
+parxch.obj: $(PARXCHLIB)
+	$(CC) $(CFLAGS) $(PDEF) /I$(PARXCHINC) /I$(PARGPSINC) $(PARXCHLIB)
+
+pargps.obj: $(PARGPSLIB)
+	$(CC) $(CFLAGS) $(PDEF) /I$(PARGPSINC) $(PARGPSLIB)
+
+
+# Clean-up rules
+clean: PHONY
+	-del a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-del $B\$(APP) $B\$(APP).exe
+
+PHONY:

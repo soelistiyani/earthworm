@@ -1,0 +1,42 @@
+LINUX_FLAGS    = -lm -lpthread
+SOLARIS_FLAGS  = -lm -lrt -lpthread
+SPECIFIC_FLAGS = $($(PLATFORM)_FLAGS)
+
+CFLAGS = $(GLOBALFLAGS)
+
+B = $(EW_HOME)/$(EW_VERSION)/bin
+L = $(EW_HOME)/$(EW_VERSION)/lib
+
+APP = eqproc
+
+OBJS = $(APP).o
+
+EW_LIBS = \
+	$L/brent.o \
+	$L/mnbrak.o \
+	$L/pipe.o \
+	$L/rdpickcoda.o \
+	$L/site.o \
+	$L/tlay.o \
+	-L$L -lew_mt
+
+all:	$B/$(APP) \
+	$B/log_everything
+
+$B/$(APP): $(OBJS)
+	$(CC) -o $@ $(CFLAGS) $(OBJS) $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+$B/log_everything: log_everything.o
+	$(CC) -o $@ $(CFLAGS) log_everything.o \
+		$L/pipe.o -L$L -lew_mt $(SPECIFIC_FLAGS)
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-$(RM) $B/$(APP)         $B/$(APP).exe
+	-$(RM) $B/log_everything $B/log_everything.exe
+
+PHONY:

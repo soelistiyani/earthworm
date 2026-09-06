@@ -1,0 +1,25 @@
+CFLAGS = $(GLOBALFLAGS)
+
+L = $(EW_HOME)/$(EW_VERSION)/lib
+
+OBJS = \
+        codautils.o \
+        hilbert_fft.o \
+        llnl_fil.o \
+        piki.o \
+        time2samp.o \
+	uwdfif.o
+
+all: $(OBJS) $L/libuw.a
+	cp *.o $L/
+
+$L/libuw.a:
+	ar rvs $L/libuw.a $(OBJS)
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+	-$(RM) libuw.a libuw.lib
+
+PHONY:

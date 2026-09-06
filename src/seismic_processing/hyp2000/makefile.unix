@@ -1,0 +1,61 @@
+#  HYP	    HYPOINVERSE EARTHQUAKE LOCATION PROGRAM. version 1.43
+
+B = $(EW_HOME)/$(EW_VERSION)/bin
+
+APP = hyp2000
+
+SRCS =  hyp.for    hybda.for  hycmd.for  hysta.for  hydel.for  hyate.for  \
+	hyfmc.for  hycal.for  hyxmc.for  hycrh.for  hycrt.for  hystl.for  \
+	hyopen.for hyinit.for hyphs.for  hysou.for  hytrl.for  hyloc.for  \
+	hysol.for  hysvd.f    hytra.for  hytrh.for  hytrt.for  hymag.for  \
+	hyrep.for  hylst.for  hysum.for  hyinp.for  hypro.for  medwt.for  \
+	utmcal.for hydelt.f   hyedit.f   hytime.f   hybeg.f    hypref.for \
+	hymagp.for linv.for   linvol.for hyfile.for hylinv.for hylin.for  \
+	hycre.for  hytre.for  trvcon.for allsubs.f  hydatum.for
+
+# The -Bstatic option loads all fortran system subroutines into the executable
+# so hyp can be copied to a similar system without fortran to run without
+# the fortran system libraries.
+
+#LDFLAGS += -Bstatic
+# Macs do not support static linking
+
+# line for loading all "common" subroutines in a library using f77:
+#	-Bstatic -L/home/calnet/klein/subs -lfs -o hyp
+# this is no longer used because it is not portable across systems & compilers
+
+all:	$B/$(APP) \
+	$B/arcprints \
+	$B/arcprint
+
+$B/$(APP): $(SRCS) common.inc
+	$(FC) -o $@ $(FFLAGS) $(LDFLAGS) $(SRCS)
+
+# arcprints is a arc2prt format printer that uses a UNIX pipe as input data
+$B/arcprints: arcprints.for allsubs.f
+	$(FC) -o $@ $(FFLAGS) arcprints.for allsubs.f
+
+# arcprint is a arc2prt format printer that prompts the user for filenames
+$B/arcprint: arcprint.for allsubs.f
+	$(FC) -o $@ $(FFLAGS) arcprint.for allsubs.f
+
+#  Simple program to convert P delays to S delays using a constant POS
+$B/p2sdly: p2sdly.for allsubs.f
+	$(FC) -o $@ $(FFLAGS) p2sdly.for allsubs.f
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-$(RM) $B/$(APP)    $B/$(APP).exe
+	-$(RM) $B/arcprint  $B/arcprint.exe
+	-$(RM) $B/arcprints $B/arcprints.exe
+	-$(RM) $B/p2sdly    $B/p2sdly.exe
+	-$(RM) -r $B/$(APP).dSYM
+	-$(RM) -r $B/arcprint.dSYM
+	-$(RM) -r $B/arcprints.dSYM
+	-$(RM) -r $B/p2sdly.dSYM
+
+PHONY:

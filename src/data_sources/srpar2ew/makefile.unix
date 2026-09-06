@@ -1,0 +1,58 @@
+LINUX_FLAGS    = -lpthread
+SOLARIS_FLAGS  = -lFAIL # SOLARIS VERSION NOT SUPPORTED (NO SOLARIS PARxCH DRIVERS)
+SPECIFIC_FLAGS = $($(PLATFORM)_FLAGS)
+
+CFLAGS = $(GLOBALFLAGS)
+
+B = $(EW_HOME)/$(EW_VERSION)/bin
+L = $(EW_HOME)/$(EW_VERSION)/lib
+
+# The following lines set the location of the SR PARxCH and PARGPS
+# library functions needed to compile SrPar2Ew.  Un-comment the
+# first line below when compiling from the Earthworm directory tree
+# and the second when compiling from the SR directory tree.
+
+SR_HOME = $(EW_HOME)/$(EW_VERSION)/src/data_sources/srpar2ew
+#SR_HOME = /usr/local/sr
+
+PARXCH = $(SR_HOME)/parxch
+PARGPS = $(SR_HOME)/pargps
+
+PARXCHINC = $(PARXCH)/include
+PARGPSINC = $(PARGPS)/include
+PARXCHLIB = $(PARXCH)/lib/parxch.c
+PARGPSLIB = $(PARGPS)/lib/pargps.c
+
+PDEF    = -DSROS_LINUX -DSRA2D_PARANY -DGPS_AVAILABLE
+CFLAGSR = -fPIC
+
+APP = srpar2ew
+
+OBJS = \
+	$(APP).o \
+	pargps.o \
+	parxch.o
+
+EW_LIBS = -L$L -lew_mt
+
+$B/$(APP): $(OBJS)
+	$(CC) -o $@ $(CFLAGS) $(OBJS) $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+$(APP).o: $(APP).c
+	$(CC) -c $(CFLAGS) $(PDEF) -I$(PARXCHINC) -I$(PARGPSINC) $(APP).c
+
+parxch.o: $(PARXCHLIB)
+	$(CC) -c $(CFLAGS) $(CFLAGSR) $(PDEF) -I$(PARXCHINC) -I$(PARGPSINC) $(PARXCHLIB)
+
+pargps.o: $(PARGPSLIB)
+	$(CC) -c $(CFLAGS) $(CFLAGSR) $(PDEF) -I$(PARGPSINC) $(PARGPSLIB)
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-$(RM) $B/$(APP) $B/$(APP).exe
+
+PHONY:

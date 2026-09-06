@@ -1,0 +1,39 @@
+#
+# Nmake file - Windows version
+# Use 'nmake -f Makefile.win'
+#
+# THIS HAS NEVER BEEN TESTED
+# Some modification might be required.
+
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG = 1
+!ENDIF
+
+!include <Win32.Mak>
+
+CFLAGS  = $(cflags)    $(cdebug) $(cvarsmt)   $(GLOBALFLAGS)
+LDFLAGS = $(conlflags) $(ldebug) $(conlibsmt)
+
+APP1 = msrepack
+APP2 = msview
+
+INCS = /I..
+LIBS = ../libmseed.lib
+
+all: $(APP1).exe $(APP2).exe
+
+$(APP1).exe: $(APP1).obj
+	$(link) /out:$@ $(LDFLAGS) $(APP1).obj $(LIBS)
+
+$(APP2).exe: $(APP2).obj
+	$(link) /out:$@ $(LDFLAGS) $(APP2).obj $(LIBS)
+
+
+# Clean-up rules
+clean: PHONY
+	-del a.out core *.o *.obj *% *~
+	-del $(APP1) $(APP2)
+	-del $(APP1).exe $(APP2).exe
+
+PHONY:

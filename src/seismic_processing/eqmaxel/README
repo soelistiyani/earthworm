@@ -1,0 +1,80 @@
+
+
+eqmaxel is an earthworm implementation of the Maximum Likelihood Earthquake locator: code named MAXEL
+	by Dr. DongHoon Sheen of Chonnam University: BSSA paper in 2016, Sheen et al.
+
+Application of the Maximum-Likelihood Location Method to the Earthquake Early Warning System in South Korea
+by Dong-Hoon Sheen, Jung-Ho Park, Yun Jeong Seong, In-Seub Lim, and Heon-Cheol Chi
+Bulletin of the Seismological Society of America, Vol. 106, No. 3, pp. –, June 2016, doi: 10.1785/0120150327
+
+The MAXEL program provides a more robust estimate of the location when teleseismic and regional phases are received at a local network.
+
+The program uses the PipeTo output of eqassemble to get the list of phases  and outputs a TYPE_HYP2000ARC message smodified to take some of the metrics of the program MAXEL
+
+
+Requirements:
+ o   1-d velocity - same format as binder_ew uses (Lay commands) 
+ o   station list - same format as binder_ew and hypoinverse uses
+ o   center lat, lon - starting point of grid
+
+GRID is built as follows from the center point:
+1.	Initial search: 20x20km cells in a 1600x1600km square - TBD - allow grid size and extent to be adjusted
+2.	Final refined search: 2x2km cells in a 40x40 square centered on MLE location from Initial search.
+
+TYPE_HYP2000ARC reuse:
+depth - fixed at 8km
+MLE - metric for estimation of quality of MLE solution is placed in rms 
+Area - size of the 95% confidence ellipsoid placed as area/1000km^2 in errH
+Error Ellipse - since only a 2D ellipsoid, placed in principal and intermediate axes (dip set to zero, smallest axes set to zero size)
+
+
+Run modes:
+1. in real-time as PipeTo from eqassemble
+2. in test mode as command line: eqmaxel eqmaxel.d test.event    
+3. in test mode as PipeTo from helper program feedeqmaxel:     ls *.event | eqmaxel eqmaxel.d
+
+EXAMPLE
+--------------
+Example test mode #2 is provided with the module and is shown below:
+
+This is a deep (600+km depth) M7.8 in the Subduction Zone beneath Japan, 
+binder_ew has a number of false solutions for this event located inside the S. Korea network.
+
+USGS Event Page:
+https://earthquake.usgs.gov/earthquakes/eventpage/us20002ki3#executive
+
+test.event - uses 8 phases, solution gets pushed out of the network
+test2.event - uses 9 phases (contains a PURELY WRONG pick from JUR station which has crazy triggers)*
+		* stations like this should not be used in automatic solutions, EVER!
+
+redhat % eqmaxel eqmaxel.d test.event 
+Using Event SCNL file: test.event
+Containing:
+20150530112517.370 36.009200 127.645800 8.00 10 199 151.3 0.80 10 2
+HES HGZ KS -- ?1 Pn 20150530112540.110 192 128 193 0 0 0 0 0 0 0 M
+BUS2 HHZ KS -- U0 Pg 20150530112542.830 38509 469 136318 0 0 0 0 0 0 0 M
+BSA HGZ KS -- U0 P 20150530112542.860 526 911 1835 0 0 0 0 0 0 0 M
+PYC HGZ KS -- ?0 P 20150530112543.570 3200 584 2972 0 0 0 0 0 0 0 M
+KUJA HGZ KS -- U0 Pg 20150530112544.580 180 309 427 0 0 0 0 0 0 0 M
+JUR HGZ KS -- ?1 P 20150530112546.070 2656 2650 496 0 0 0 0 0 0 0 M
+PHA2 HGZ KS -- U3 Pg 20150530112546.350 138 4 441 0 0 0 0 0 0 0 M
+UJN HGZ KS -- D2 Pg 20150530112552.370 1270 552 85 0 0 0 0 0 0 0 M
+IMWB HGZ KS -- ?2 Pg 20150530112552.740 120 85 358 0 0 0 0 0 0 0 M
+
+20170720_UTC_12:21:16 INFO: using HES.HGZ.KS.-- 20150530112540.110 lat=37.493000 lon=127.993000 Phs=Pn x=46.518584 y=187.237056 epoch=13109081140.110001
+20170720_UTC_12:21:16 INFO: using BUS2.HHZ.KS.-- 20150530112542.830 lat=35.248600 lon=129.112500 Phs=Pg x=145.771561 y=-62.185630 epoch=13109081142.830000
+20170720_UTC_12:21:16 INFO: using BSA.HGZ.KS.-- 20150530112542.860 lat=35.104800 lon=129.031900 Phs=P x=138.444105 y=-78.138303 epoch=13109081142.860001
+20170720_UTC_12:21:16 INFO: using PYC.HGZ.KS.-- 20150530112543.570 lat=37.371300 lon=128.390700 Phs=P x=81.588252 y=173.433441 epoch=13109081143.570000
+20170720_UTC_12:21:16 INFO: using KUJA.HGZ.KS.-- 20150530112544.580 lat=34.888500 lon=128.604700 Phs=Pg x=99.416154 y=-102.054329 epoch=13109081144.580000
+20170720_UTC_12:21:16 INFO: using JUR.HGZ.KS.-- 20150530112546.070 lat=37.613500 lon=127.088400 Phs=P x=-33.181550 y=201.847764 epoch=13109081146.070000
+20170720_UTC_12:21:16 INFO: using PHA2.HGZ.KS.-- 20150530112546.350 lat=36.193000 lon=129.370800 Phs=Pg x=168.874666 y=42.615166 epoch=13109081146.350000
+20170720_UTC_12:21:16 INFO: using UJN.HGZ.KS.-- 20150530112552.370 lat=36.992000 lon=129.413000 Phs=Pg x=172.287948 y=131.260750 epoch=13109081152.370001
+20170720_UTC_12:21:16 INFO: using IMWB.HGZ.KS.-- 20150530112552.740 lat=37.238000 lon=129.341900 Phs=Pg x=165.862781 y=158.525913 epoch=13109081152.740000
+20170720_UTC_12:21:16 DEBUG 9 phases will be used
+
+Try to locate an earthquake with 9 phases
+LOCATION (step 1/ 9 phs) 126.8412 35.6097 (-60.0,-20.0) (0.9538/0.9538) MLE 0.000056
+LOCATION (step 2/ 9 phs) 127.0385 35.6671 (-42.0,-14.0) (0.3286/0.3286) MLE 0.000155
+Confidence interval points: 132
+run completed, exiting
+

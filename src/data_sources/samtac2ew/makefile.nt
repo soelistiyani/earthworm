@@ -1,0 +1,53 @@
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG = 1
+!ENDIF
+
+!include <Win32.Mak>
+
+CFLAGS  = $(cflags)    $(cdebug) $(cvarsmt)   $(GLOBALFLAGS) /D_NTSDK /DDEBUG
+LDFLAGS = $(conlflags) $(ldebug) $(conlibsmt)
+
+B = $(EW_HOME)\$(EW_VERSION)\bin
+L = $(EW_HOME)\$(EW_VERSION)\lib
+
+APP = samtac2ew
+
+OBJS = \
+	samtac2ew_main.obj \
+	getconfig.obj \
+	samtac2ew_misc.obj \
+	heartbt.obj \
+	error_ew_nt.obj \
+	scnl_map.obj \
+	logo.obj \
+	convert.obj \
+	terminat.obj \
+	samtac2ew_buffer.obj
+
+TCP_OBJS = samtac2c_tcp.obj
+
+COM_OBJS = samtac2c_ser_nt.obj
+
+EW_SOCK_LIBS = $L\socket_ew_common.obj $L\socket_ew.obj
+
+EW_LIBS = /LIBPATH:$L libew_mt.lib
+
+all:	$B\samtac2ew_com.exe 
+	$B\samtac2ew_tcp.exe
+
+$B\samtac2ew_com.exe: $(OBJS) $(COM_OBJS)
+	$(link) /out:$@ $(LDFLAGS) $(OBJS) $(COM_OBJS) $(EW_LIBS)
+
+$B\samtac2ew_tcp.exe: $(OBJS) $(TCP_OBJS)
+	$(link) /out:$@ $(LDFLAGS) $(OBJS) $(TCP_OBJS) $(EW_LIBS)
+
+
+# Clean-up rules
+clean: PHONY
+	-del a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-del $B\$(APP) $B\$(APP).exe
+
+PHONY:

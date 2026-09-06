@@ -1,0 +1,50 @@
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG=1
+!ENDIF
+NODEBUG=1
+
+!include <Win32.Mak>
+
+CFLAGS  = $(cflags)    $(cdebug) $(cvarsmt)   $(GLOBALFLAGS) $(WEBPAGE)
+LDFLAGS = $(conlflags) $(ldebug) $(conlibsmt)
+
+B = $(EW_HOME)\$(EW_VERSION)\bin
+L = $(EW_HOME)\$(EW_VERSION)\lib
+
+HTML = $(APP).html
+
+WEBPAGE = /D_HTMLVAR=$(APP)_html_gz /D_HTMLVARLEN=$(APP)_html_gz_len
+
+APP = webswave
+
+OBJS = \
+	$(APP).obj \
+	mongoose.obj
+
+EW_LIBS = \
+	/LIBPATH:$L \
+	fleng.o \
+        rdpickcoda.obj \
+        rw_mag.o \
+	site.o \
+        socket_ew.o \
+        socket_ew_common.obj \
+        swap.o \
+	ws_clientII.o \
+	libew_mt.lib
+
+$B\$(APP).exe: $(OBJS)
+	$(link) /out:$@ $(LDFLAGS) $(OBJS) $(EW_LIBS)
+
+$(APP).obj: $(APP).c webpage.h
+
+
+# Clean-up rules
+clean: PHONY
+	-del a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-del $B\$(APP) $B\$(APP).exe
+
+PHONY:

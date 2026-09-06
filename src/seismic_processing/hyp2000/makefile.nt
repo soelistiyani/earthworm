@@ -1,0 +1,59 @@
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG = 1
+!ENDIF
+
+!include <Win32.Mak>
+
+CFLAGS  = $(cflags)    $(cdebug) $(cvarsmt)   $(GLOBALFLAGS)
+LDFLAGS = $(conlflags) $(ldebug) $(conlibsmt)
+
+B = $(EW_HOME)\$(EW_VERSION)\bin
+L = $(EW_HOME)\$(EW_VERSION)\lib
+
+APP = hyp2000
+
+SRCS =  hyp.for    hybda.for  hycmd.for  hysta.for  hydel.for  hyate.for  \
+	hyfmc.for  hycal.for  hyxmc.for  hycrh.for  hycrt.for  hystl.for  \
+	hyopen.for hyinit.for hyphs.for  hysou.for  hytrl.for  hyloc.for  \
+	hysol.for  hysvd.f    hytra.for  hytrh.for  hytrt.for  hymag.for  \
+	hyrep.for  hylst.for  hysum.for  hyinp.for  hypro.for  medwt.for  \
+	utmcal.for hydelt.f   hyedit.f   hytime.f   hybeg.f    hypref.for \
+	hymagp.for linv.for   linvol.for hyfile.for hylinv.for hylin.for  \
+	hycre.for  hytre.for  trvcon.for allsubs.f  hydatum.for
+
+all:	$B\$(APP).exe \
+	$B\arcprints.exe \
+	$B\arcprint.exe
+
+$B\$(APP).exe: $(SRCS) common.inc
+	$(FC) /exe:$@ $(FFLAGS) $(LDFLAGS) $(SRCS)
+
+# arcprints is a arc2prt format printer that uses a UNIX pipe as input data
+$B\arcprints.exe: arcprints.for allsubs.f
+	$(FC) /exe:$@ $(FFLAGS) $(LDFLAGS) arcprints.for allsubs.f
+
+# arcprint is a arc2prt format printer that prompts the user for filenames
+$B\arcprint.exe: arcprint.for allsubs.f
+	$(FC) /exe:$@ $(FFLAGS) $(LDFLAGS) arcprint.for allsubs.f
+
+#  Simple program to convert P delays to S delays using a constant POS
+$B\p2sdly.exe:	p2sdly.for allsubs.f
+	$(FC) /exe:$@ $(FFLAGS) $(LDFLAGS) p2sdly.for allsubs.f
+
+
+# Clean-up rules
+clean: PHONY
+	-del a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-del $B\$(APP)    $B\$(APP).exe
+	-del $B\arcprint  $B\arcprint.exe
+	-del $B\arcprints $B\arcprints.exe
+	-del $B\p2sdly    $B\p2sdly.exe
+	-rmdir /S /Q $B\$(APP).dSYM
+	-rmdir /S /Q $B\arcprint.dSYM
+	-rmdir /S /Q $B\arcprints.dSYM
+	-rmdir /S /Q $B\p2sdly.dSYM
+
+PHONY:

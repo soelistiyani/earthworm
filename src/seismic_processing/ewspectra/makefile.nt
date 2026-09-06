@@ -1,0 +1,55 @@
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG=1
+!ENDIF
+
+!include <Win32.Mak>
+
+CFLAGS  = $(cflags)    $(cdebug) $(cvarsmt)   $(GLOBALFLAGS)
+LDFLAGS = $(conlflags) $(ldebug) $(conlibsmt)
+
+B = $(EW_HOME)\$(EW_VERSION)\bin
+L = $(EW_HOME)\$(EW_VERSION)\lib
+
+APP = ewspectra
+APPc = activate_module
+APPs = sniffspectra
+
+OBJS = \
+	$(APP).obj \
+	iir.obj
+OBJSc = activate_module.obj
+OBJSs = sniffspectra.obj
+
+EW_LIBS = \
+	/LIBPATH:$L \
+	ew_spectra_io.obj \
+	mem_circ_queue.obj \
+	socket_ew.obj \
+	socket_ew_common.obj \
+	swap.obj \
+	ws_clientII.obj \
+	libew_mt.lib
+
+all:	$B\$(APP).exe \
+	$B\$(APPc).exe \
+	$B\$(APPs).exe
+
+$B\$(APP).exe: $(OBJS)
+	$(link) /out:$@ $(LDFLAGS) $(OBJS) $L\ws2ts.obj $(EW_LIBS)
+$B\$(APPc).exe: $(OBJSc)
+	$(link) /out:$@ $(LDFLAGS) $(OBJSc) $(EW_LIBS)
+$B\$(APPs).exe: $(OBJSs)
+	$(link) /out:$@ $(LDFLAGS) $(OBJSs) $(EW_LIBS)
+
+
+# Clean-up rules
+clean: PHONY
+	-del a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-del $B\$(APP)  $B\$(APP).exe
+	-del $B\$(APPc) $B\$(APPc).exe
+	-del $B\$(APPs) $B\$(APPs).exe
+
+PHONY:

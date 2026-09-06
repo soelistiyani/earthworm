@@ -1,0 +1,65 @@
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG = 1
+!ENDIF
+
+!include <Win32.Mak>
+
+CFLAGS  = $(cflags)    $(cdebug) $(cvarsmt)   $(GLOBALFLAGS)
+LDFLAGS = $(conlflags) $(ldebug) $(conlibsmt)
+
+B = $(EW_HOME)\$(EW_VERSION)\bin
+L = $(EW_HOME)\$(EW_VERSION)\lib
+
+APP = gmew
+
+OBJS = \
+	$(APP).obj \
+	gm_config.obj \
+	gm_sac.obj \
+	gm_util.obj \
+	gm_ws.obj \
+	gm_xml.obj \
+	lm_misc.obj \
+	lm_site.obj
+
+EW_LIBS = \
+	/LIBPATH:$L \
+	brent.obj \
+	dirops_ew.obj \
+	ew_spectra_io.obj \
+	fft_prep.obj \
+	fft99.obj \
+	gma.obj \
+	mem_circ_queue.obj \
+	mnbrak.obj \
+	parse_ip_address.obj \
+	read_arc.obj \
+	rw_strongmotionII.obj \
+	socket_ew.obj \
+	socket_ew_common.obj \
+	swap.obj \
+	tlay.obj \
+	transfer.obj \
+	ws_clientII.obj \
+	libew_mt.lib
+
+$B\$(APP).exe: $(OBJS)
+	$(link) /out:$@ $(LDFLAGS) $(OBJS) $(EW_LIBS)
+
+lm_site.obj: ..\localmag\lm_site.c
+	$(CC) $(CFLAGS) ..\localmag\lm_site.c
+
+lm_misc.obj: ..\localmag\lm_misc.c
+	$(CC) $(CFLAGS) ..\localmag\lm_misc.c
+
+
+# Clean-up rules
+clean: PHONY
+	-del a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-del $B\$(APP)     $B\$(APP).exe
+	-del $B\compute_gm $B\compute_gm.exe
+
+PHONY:

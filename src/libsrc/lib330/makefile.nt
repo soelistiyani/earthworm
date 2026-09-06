@@ -1,0 +1,52 @@
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG = 1
+!ENDIF
+
+!include <Win32.Mak>
+
+CFLAGS  = $(cflags)    $(cdebug) $(cvarsmt)   $(GLOBALFLAGS) \
+		/DX86_WIN32 /w24005 /w24047 /w24024 /w24048 /w24133
+
+L = $(EW_HOME)\$(EW_VERSION)\lib
+
+OBJS = \
+	libarchive.obj \
+	libclient.obj \
+	libcmds.obj \
+	libcompress.obj \
+	libcont.obj \
+	libctrldet.obj \
+	libcvrt.obj \
+	libdetect.obj \
+	libdss.obj \
+	libfilters.obj \
+	liblogs.obj \
+	libmd5.obj \
+	libmsgs.obj \
+	libnetserv.obj \
+	libopaque.obj \
+	libpoc.obj \
+	libsampcfg.obj \
+	libsample.obj \
+	libseed.obj \
+	libslider.obj \
+	libstats.obj \
+	libstrucs.obj \
+	libsupport.obj \
+	libtokens.obj \
+	libtypes.obj \
+	libverbose.obj \
+	q330cvrt.obj \
+	q330io.obj
+
+lib330.lib: $(OBJS)
+	lib /nologo /OUT:$@ $(OBJS)
+
+
+# Clean-up rules
+clean: PHONY
+	-del a.out core *.o *.obj *% *~
+	-del lib330.a lib330.lib
+
+PHONY:

@@ -1,0 +1,18 @@
+#
+# Dummy makefile - only used for cleaning things up
+#
+
+B = $(EW_HOME)\$(EW_VERSION)\bin
+
+default: FAIL
+
+
+# Clean-up rules
+clean: PHONY
+	-del a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-del $B\ark2arc $B\ark2arc.exe
+	-del $B\pdl2ark $B\pdl2ark.exe
+
+PHONY:

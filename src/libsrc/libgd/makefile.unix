@@ -1,0 +1,41 @@
+CFLAGS = $(GLOBALFLAGS) -O
+
+L = $(EW_HOME)/$(EW_VERSION)/lib
+B = $(EW_HOME)/$(EW_VERSION)/bin
+
+OBJS = \
+	gd.o \
+	gdfontg.o \
+	gdfontl.o \
+	gdfontmb.o \
+	gdfonts.o \
+	gdfontt.o
+
+LIBS = -L$L -lgd -lm
+
+all: $L/libgd.a $B/gddemo $B/giftogd $B/webgif
+
+$L/libgd.a: $L/libgd.a($(OBJS))
+	ranlib $@
+
+$B/gddemo: gddemo.o gd.h gdfonts.h gdfontl.h
+	$(CC) -o $@ $(CFLAGS) gddemo.o $(LIBS)
+
+$B/giftogd: giftogd.o gd.h
+	$(CC) -o $@ $(CFLAGS) giftogd.o $(LIBS)
+
+$B/webgif: webgif.o gd.h
+	$(CC) -o $@ $(CFLAGS) webgif.o $(LIBS)
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+	-$(RM) $L/libgd.a $L/libgd.lib
+
+clean_bin: PHONY
+	-$(RM) $B/gddemo  $B/gddemo.exe
+	-$(RM) $B/giftogd $B/giftogd.exe
+	-$(RM) $B/webgif  $B/webgif.exe
+
+PHONY:

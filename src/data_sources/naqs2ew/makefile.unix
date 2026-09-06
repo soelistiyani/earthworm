@@ -1,0 +1,58 @@
+LINUX_FLAGS    = -lm -lpthread
+SOLARIS_FLAGS  = -lm -lnsl -lsocket -lrt -lpthread
+SPECIFIC_FLAGS = $($(PLATFORM)_FLAGS)
+
+CFLAGS = $(GLOBALFLAGS)
+
+B = $(EW_HOME)/$(EW_VERSION)/bin
+L = $(EW_HOME)/$(EW_VERSION)/lib
+
+OBJS = \
+	crc32.o \
+	nmx_api.o \
+	nmxp_packet.o \
+	nmxsrv_socket.o
+
+EW_LIBS = \
+	$L/socket_ew.o \
+	$L/swap.o \
+	$L/threads_ew.o \
+	$L/socket_ew_common.o \
+	-L$L -lew_mt
+
+all:	$B/naqs2ew \
+	$B/naqssoh \
+	$B/getmenu-nmx \
+	# $B/naqsserTG
+
+$B/naqs2ew: naqs2ew.o channels.o naqschassis.o $(OBJS)
+	$(CC) -o $@ $(CFLAGS) naqs2ew.o channels.o naqschassis.o $(OBJS) \
+		$(EW_LIBS) $(SPECIFIC_FLAGS)
+
+$B/naqssoh: naqssoh.o sohchannels.o naqschassis.o $(OBJS)
+	$(CC) -o $@ $(CFLAGS) naqssoh.o sohchannels.o naqschassis.o $(OBJS) \
+		$(EW_LIBS) $(SPECIFIC_FLAGS)
+
+$B/naqsserTG: naqsserTG.o serchannels.o naqschassis.o $(OBJS)
+	$(CC) -o $@ naqsserTG.o serchannels.o naqschassis.o $(OBJS) \
+		$(EW_LIBS) $(SPECIFIC_FLAGS)
+
+$B/getmenu-nmx: getmenu-nmx.o $(OBJS)
+	$(CC) -o $@ $(CFLAGS) getmenu-nmx.o $(OBJS) $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+$B/dsclient: dschassis.o $(OBJS)
+	$(CC) -o $@ $(CFLAGS) dschassis.o $(OBJS) $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-$(RM) $B/naqs2ew     $B/naqs2ew.exe
+	-$(RM) $B/naqssoh     $B/naqssoh.exe
+	-$(RM) $B/naqsserTG   $B/naqsserTG.exe
+	-$(RM) $B/getmenu-nmx $B/getmenu-nmx.exe
+	-$(RM) $B/dsclient    $B/dsclient.exe
+
+PHONY:

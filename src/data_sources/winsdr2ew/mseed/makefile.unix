@@ -1,0 +1,72 @@
+LINUX_FLAGS    = -lm -lpthread
+SOLARIS_FLAGS  = -lm -lnsl -lsocket -lrt -lpthread
+SPECIFIC_FLAGS = $($(PLATFORM)_FLAGS)
+
+CFLAGS = $(GLOBALFLAGS) -O
+
+# Options specific for GCC
+GCC = gcc
+GCCFLAGS = $(CFLAGS) -Wall -fPIC
+
+L = $(EW_HOME)/$(EW_VERSION)/lib
+
+LIB_OBJS = \
+	genutils.o \
+	msrutils.o \
+	pack.o \
+	packdata.o \
+	unpack.o \
+	unpackdata.o
+
+LIB_A = libpsnms.a
+
+all: static
+
+static: $(LIB_A)
+
+shared: gcc $(LIB_SO)
+
+dynamic: gcc $(LIB_DYN)
+
+$(LIB_A): $(LIB_A)($(LIB_OBJS))
+
+cc: PHONY
+	@$(MAKE) "CC=$(CC)" "CFLAGS=$(CFLAGS)"
+
+gcc: PHONY
+	@$(MAKE) "CC=$(GCC)" "CFLAGS=$(GCCFLAGS)"
+
+gcc32: PHONY
+	@$(MAKE) "CC=$(GCC)" "CFLAGS=-m32 $(GCCFLAGS)"
+
+gcc64: PHONY
+	@$(MAKE) "CC=$(GCC)" "CFLAGS=-m64 $(GCCFLAGS)"
+
+debug: PHONY
+	$(MAKE) "CC=$(CC)" "CFLAGS=-g $(CFLAGS)"
+
+gccdebug: PHONY
+	$(MAKE) "CC=$(GCC)" "CFLAGS=-g $(GCCFLAGS)"
+
+gcc32debug: PHONY
+	$(MAKE) "CC=$(GCC)" "CFLAGS=-g -m32 $(GCCFLAGS)"
+
+gcc64debug: PHONY
+	$(MAKE) "CC=$(GCC)" "CFLAGS=-g -m64 $(GCCFLAGS)"
+
+gcc32gprof: PHONY
+	$(MAKE) "CC=$(GCC)" "CFLAGS=-pg -m32 $(GCCFLAGS)"
+
+gcc64gprof: PHONY
+	$(MAKE) "CC=$(GCC)" "CFLAGS=-pg -m64 $(GCCFLAGS)"
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+	-$(RM) libpsnms.a libpsnms.llib
+
+clean_bin: PHONY
+	# Placeholder
+
+PHONY:

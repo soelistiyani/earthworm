@@ -1,0 +1,35 @@
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG = 1
+!ENDIF
+
+!include <Win32.Mak>
+
+CFLAGS  = $(cflags)    $(cdebug) $(cvarsmt)   $(GLOBALFLAGS) /O /I..\.. /DWINNT
+
+OBJS = \
+	accept.obj \
+	attr.obj \
+	close.obj \
+	cmdpkt.obj \
+	log.obj \
+	misc.obj \
+	open.obj \
+	pid.obj \
+	recv.obj \
+	send.obj \
+	server.obj \
+	soh.obj \
+	stat.obj \
+	version.obj
+
+..\librtp.lib: $(OBJS)
+	lib /nologo /out:$@ $(OBJS)
+
+
+# Clean-up rules
+clean: PHONY
+	-del a.out core *.o *.obj *% *~
+	-del ..\librtp.a ..\librtp.lib
+
+PHONY:

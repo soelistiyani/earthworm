@@ -1,0 +1,30 @@
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG = 1
+!ENDIF
+
+!include <Win32.Mak>
+
+CFLAGS  = $(cflags)    $(cdebug) $(cvarsmt)   $(GLOBALFLAGS) /O /I..\.. /DWINNT
+
+OBJS = \
+	bcd2long.obj \
+	dump.obj \
+	getline.obj \
+	mstime.obj \
+	parse.obj \
+	string.obj \
+	swap.obj \
+	timefunc.obj \
+	timer.obj
+
+..\libutil.lib: $(OBJS)
+	lib /nologo /out:$@ $(OBJS)
+
+
+# Clean-up rules
+clean: PHONY
+	-del a.out core *.o *.obj *% *~
+	-del ..\libutil.a ..\libutil.lib
+
+PHONY:

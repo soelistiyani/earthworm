@@ -1,0 +1,55 @@
+LINUX_FLAGS    = -lm -lpthread
+SOLARIS_FLAGS  = -lm -lnsl -lsocket -lrt -lpthread
+SPECIFIC_FLAGS = $($(PLATFORM)_FLAGS)
+
+CFLAGS = $(GLOBALFLAGS) -I$E
+
+B = $(EW_HOME)/$(EW_VERSION)/bin
+L = $(EW_HOME)/$(EW_VERSION)/lib
+E = ../export
+
+EW_LIBS = \
+	$L/getsysname_ew.o \
+	$L/mem_circ_queue.o \
+	$L/swap.o \
+	-L$L -lmseed -lew_mt
+
+all:	$B/ringdup_generic \
+	$B/ringdup_scn \
+	$B/tbuf2mseed \
+	$B/mseed2tbuf
+
+$B/ringdup_generic: ringdup.o $E/genericfilter.o
+	$(CC) -o $@ $(CFLAGS) ringdup.o $E/genericfilter.o \
+		$(EW_LIBS) $(SPECIFIC_FLAGS)
+
+$B/ringdup_scn: ringdup.o $E/scnfilter.o
+	$(CC) -o $@ $(CFLAGS) ringdup.o $E/scnfilter.o \
+		$L/rdpickcoda.o $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+$B/tbuf2mseed: tbuf2mseed.o $E/scnfilter.o
+	$(CC) -o $@ $(CFLAGS) tbuf2mseed.o $E/scnfilter.o \
+		$L/rdpickcoda.o $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+$B/mseed2tbuf: mseed2tbuf.o $E/scnfilter.o
+	$(CC) -o $@ $(CFLAGS) mseed2tbuf.o $E/scnfilter.o \
+		$L/rdpickcoda.o $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+tbuf2mseed.o: ringdup.c
+	$(CC) -c -o $@ $(CFLAGS) -D_TBUF2MSEED ringdup.c
+
+mseed2tbuf.o: ringdup.c
+	$(CC) -c -o $@ $(CFLAGS) -D_MSEED2TBUF ringdup.c
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-$(RM) $B/ringdup_generic $B/ringdup_generic.exe
+	-$(RM) $B/ringdup_scn     $B/ringdup_scn.exe
+	-$(RM) $B/mseed2tbuf      $B/mseed2tbuf.exe
+	-$(RM) $B/tbuf2mseed      $B/tbuf2mseed.exe
+
+PHONY:

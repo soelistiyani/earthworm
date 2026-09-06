@@ -1,0 +1,62 @@
+########################################################################
+# Linux definitions
+#
+LINUX_CFLAGS = $(GLOBALFLAGS) -I$(INCL)
+LINUX_RANLIB = ranlib
+########################################################################
+
+########################################################################
+# Solaris 2 definitions
+#
+SOLARIS_CFLAGS = $(GLOBALFLAGS) -I$(INCL) -DSOLARIS2
+SOLARIS_RANLIB = ranlib
+########################################################################
+
+INCL	= ../include
+
+CFLAGS = $($(PLATFORM)_CFLAGS)
+RANLIB = $($(PLATFORM)_RANLIB)
+
+LIB	= libutil.a
+
+OBJECTS = service.o cfgutil.o stuff.o seedutil.o timeutil.o # mmutil.o
+
+
+.PRECIOUS:	$(LIB)
+
+ALL =		$(LIB)
+
+all:		$(ALL)
+
+$(LIB):		$(OBJECTS)
+		ar rvs $(LIB) $(OBJECTS)
+		$(RANLIB) $@
+
+timeutil.o:	$(INCL)/dpstruc.h $(INCL)/quanstrc.h $(INCL)/service.h \
+		$(INCL)/stuff.h timeutil.c
+
+seedutil.o:	$(INCL)/dpstruc.h $(INCL)/quanstrc.h $(INCL)/service.h \
+		$(INCL)/seedstrc.h $(INCL)/stuff.h seedutil.c
+
+mmutil.o:	$(INCL)/dpstruc.h $(INCL)/quanstrc.h $(INCL)/service.h \
+		$(INCL)/stuff.h mmutil.c
+
+service.o:	$(INCL)/dpstruc.h $(INCL)/service.h $(INCL)/stuff.h \
+		service.c
+
+cfgutil.o:	$(INCL)/dpstruc.h cfgutil.c $(INCL)/stuff.h
+
+stuff.o:	$(INCL)/dpstruc.h stuff.c
+
+clean:		PHONY
+		-$(RM) a.out core *.o *.obj *% *~
+		-$(RM) $(LIB)
+
+veryclean:	clean
+		-$(RM) a.out core *.o *.obj *% *~
+		-$(RM) $(LIB)
+
+install:	PHONY
+
+PHONY:
+

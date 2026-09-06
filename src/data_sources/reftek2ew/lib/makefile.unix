@@ -1,0 +1,26 @@
+# Make all libraries
+
+reftek rtp util: PHONY
+	@cd $@ && \
+		echo ---------- ; \
+		echo Making $@ in: `pwd` ; \
+		$(MAKE) -f makefile.unix
+
+
+# Clean-up rules
+clean:	clean/here \
+	clean/reftek \
+	clean/rtp \
+	clean/util
+
+clean/here: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+
+clean/reftek \
+clean/rtp \
+clean/util: PHONY
+	-@cd $(@F) && \
+		echo Cleaning in: `pwd` ; \
+		$(MAKE) -f makefile.unix clean
+
+PHONY:

@@ -1,0 +1,14 @@
+Package: earthworm
+Version: 7.10-1ubuntu2
+Architecture: amd64
+Maintainer: Alexander Schnackenberg <a.schnackenberg@isti.com>
+Installed-Size: 200053
+Depends: libgfortran4
+Section: science
+Priority: optional
+Homepage: www.earthwormcentral.org
+Description: Earthworm provides users with an advanced open source seismic data acquisition and processing
+ capable of calculating earthquake locations and magnitudes.
+ .
+ The Earthworm system is a robust and mature software tool, incorporating over 25 years of design and
+ development.

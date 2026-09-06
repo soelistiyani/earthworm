@@ -1,0 +1,65 @@
+# @(#)makefile.unix
+# USGS style makefile for reftek2ew
+#
+# This makefile requires that the Reftek RTP libraries already exist
+# on your system.  If you don't have it, get it from
+#
+#        ftp://ftp.reftek.com:/pub/rtp
+#
+# and follow the directions therein to build the library.  Specify the
+# directory containing the libraries and include files as shown:
+
+LINUX_FLAGS    = -lm -lpthread
+SOLARIS_FLAGS  = -lm -lnsl -lsocket -lrt -lpthread
+SPECIFIC_FLAGS = $($(PLATFORM)_FLAGS)
+
+CFLAGS = $(GLOBALFLAGS)
+
+B = $(EW_HOME)/$(EW_VERSION)/bin
+L = $(EW_HOME)/$(EW_VERSION)/lib
+
+RTP_DIR = lib
+
+APP = reftek2ew
+
+OBJS = \
+	main.o \
+	hbeat.o \
+	init.o \
+	notify.o \
+	params.o \
+	samprate.o \
+	scn.o \
+	send.o \
+	terminate.o
+
+RTP_LIB = -L$(RTP_DIR) -lreftek -lutil -lrtp
+
+EW_LIBS = -L$L -lew_mt
+
+$B/reftek2ew: $(OBJS) libs
+	$(CC) -o $@ $(CFLAGS) $(LDFLAGS) $(RTP_LIB) $(OBJS) $(SPECIFIC_FLAGS)
+
+libs: $(RTP_DIR)/libreftek.a $(RTP_DIR)/libutil.a $(RTP_DIR)/librtp.a
+	@cd $(RTP_DIR) && \
+		echo ---------- ; \
+		echo Making $@ in: `pwd` ; \
+		$(MAKE) -f makefile.unix
+
+
+# Clean-up rules
+clean:	clean/here \
+	clean/lib
+
+clean/here: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+
+clean/lib: PHONY
+	-@cd $(RTP_DIR) && \
+		echo Cleaning in: `pwd` ; \
+		$(MAKE) -f makefile.unix clean
+
+clean_bin: PHONY
+	-$(RM) $B/$(APP) $B/$(APP).exe
+
+PHONY:

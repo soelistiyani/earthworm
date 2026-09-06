@@ -1,0 +1,252 @@
+<HTML>
+<HEAD>
+<TITLE> EW v7.10 released on August 12, 2019</TITLE>
+
+<BODY TEXT="#000000" BGCOLOR="#FADFAF" LINK="#0000EE" VLINK="#551A8B" ALINK="#FF
+0000">
+
+<CENTER>
+  <H1>Earthworm Release Notes V7.10</H1>
+  <I>(March 19, 2019)</I>
+</CENTER>
+<p> <a href="#modules">New Modules</a><br>
+  <a href="#modifications">Modifications/ Bug Fixes to Existing Modules</a> <br>
+  <a href="#config">Changes To Configuration Files And Descriptor Files</a><br>
+  <a href="#library">Library Changes</a><br>
+  <a href="#reqs">System Requirements</a>
+<p>
+<PRE>
+
+<b><a name=modules>NEW MODULES:</a></b>
+
+eqmaxel - MAXEL Maximum Likelihood Estimator (MLE) from Dong Hoon Sheen integrated as an 
+earthworm module that can be bolted on as another locator in the megamodule.
+I listed this here becuase we made mods in 2018 to this module.
+Paul Friberg and Dong Hoon Sheen July 20, 2017
+
+pick_ffp - eBEAR tauC and Pd picker based off of Pick_FP instead of pick_ew.
+Jin Koo Lee February 25, 2018
+
+pick_gm - eBEAR tauC and Pd ground motion packet generator in a real-time sense (not pick based).
+Jin Koo Lee February 25, 2018
+
+buildinfo - not really a module, but a command that will print out the
+build information, including the data and time of the build, and the
+EW_BITS, 32 or 64, of the build.  For example:
+
+buildinfo: Linux EARTHWORM-64 build of Mar 16 2019 16:44:24
+
+On Windows systems, the MSVC compiler version, the target Windows release,
+and the Windows SDK for the build are printed.  On *nix systems, no
+additional information is printed.
+Larry Baker January 12, 2019
+
+<b><a name=modifications>MODIFICATIONS/BUG FIXES TO EXISTING MODULES:</a></b>
+
+Note:
+Check library changes at the bottom for a more complete picture as applications
+that used these libraries were changed accordingly
+
+eqassemble
+Added output of TYPE_EVENT_SCNL message to the Debug flag (for use as input testing to eqmaxel).
+Paul Friberg July 18, 2017
+
+binder_ew
+Fixed a number of edge cases dealing with quake_id.d (thanks to Jin Koo Lee) and also changed the travel
+time lookup to allow for finer grained station locations relative to the earthquake. The prior system
+dealt in convering travel times to an integer in tenths of a second and that is not enough resolution for
+mines or small scale networks less than a kilometer on an edge.
+Paul Friberg, version 1.0.38 2019.02.14
+
+nll_mgr
+NonLinLoc manager had Debug flag added in for review of actions and a version number was added for tracking.
+Paul Friberg, October 23, 2018
+
+ewhtmlemail
+Major modifications to using Google Earth maps, there are new GoogleMap key and secret settings in the .d
+Paul Friberg July 2018
+
+gmewhtmlemail
+Many modifications for USBR for the dam safety division
+Paul Friberg & Scott Hunter  Jan to May 2018
+
+restart/copystatus:
+Ticket #683 http://earthworm.isti.com/trac/earthworm/ticket/683
+Removed 'TypeRestart' from types copystatus is to copy. Rewrote 'restart'
+to look up statmgr ring and write to that directly, if it exists
+Alexander Schnackenberg February 13, 2019
+
+Hypo71PC
+Modifications to ensure a safe crossing of the Greenwich Meridian (lon = 0°)
+(bug present in the original version of Hypo71, revealed in the Pyrenees where
+the pathological case "lon(closest station) x lon(epicenter) < 0 is not uncommon)
+M. Sylvander (Toulouse, France) November 30, 2018
+
+hyp2000/hyp2000_mgr
+Upgraded to version 1.42 which cleaned up a CRE bug and a licensing issue with some sorting routines.
+(CRE bug fix reported by Jim Pechmann)
+Fred Klein & Paul Friberg April 23, 2018
+Upgraded to version 1.43 which fixed some infinite loop cases found at AVO
+Larry Baker & Paul Friberg December 2018
+
+sniffwave
+Added out-of-order packet message to the previous gap and overlap checks (gap and overlap) 
+Paul Friberg March 15, 2018
+
+ms2tank
+Now echo's back the MINISEED encoding format in the file if it is not compatible with the program. 
+Previously it just said that the encoding format was not one of the allowed ones, but that is not
+enough information. For instance IEEE Double's are not handled yet, since TRACEBUF2 only allows
+integer counts.
+Paul Friberg        October 11, 2017
+
+ewthresh
+Changed computation of bias to a rolling average; added gap detection & resetting of 
+various timers & bias computation when gap detected.  Added gap threshold & window size
+paramaters to config file (optional).
+Scott Hunter        September 20, 2017
+
+decimate
+Cleaned up some compilation issues on newer versions of ubuntu (16). 
+Paul Friberg		September 7, 2017
+
+ew2rsam
+Added slicing the input data packets into 1 second packets before processing them
+Processing code wich assumes 1s data packets has not been modified
+This allow the rsam computation to work as expected with variable length TraceBuf packets (as produced by slink_srv)
+Jean-Marie Saurel	July 18, 2017
+
+pick_FP 
+Fixed a bug in offline mode. Thanks to Jin Koo Lee from KITValley Co LTD for reporting this bug. new version v0.0.6
+Paul Friberg		June 5, 2017  
+Fixed a bug in windows mode. Thanks to Jin Koo Lee from KITValley Co LTD for reporting this bug. new version v0.0.7
+Paul Friberg		Dec 21, 2017  
+
+libsrc/util/wfdiscputaway.c
+Modified output format for CSS wfdisc data at request of the current only user:  isla.hawaii.edu
+Ilya Dricker          February 23 2017
+
+slink2ew
+Ticket #565. http://earthworm.isti.com/trac/earthworm/ticket/565
+Add MseedRing command to echo/redirect output in miniSEED format to 
+a different ring.
+Scott Hunter          January 25, 2017
+
+nmxptool
+Update nmxptool version 2.1.4
+Matteo Quintiliani    January 4, 2017
+
+localmag
+Add parameter searchTimesTauSFunc, alternative for searchTimes
+The end time of window for searching for peak amplitudes is defined by 
+     Estimated_S_Times + ( K1 * ( 1 - exp( - TauS / K2 ) ) )
+where TauS = Estimated_S_Times - Origin_Time
+Read details in localmag.d or next section "CHANGES to CONFIGURATION FILES"
+Matteo Quintiliani and Franco Mele    December 7, 2016
+
+scream2ew - added in 250Hz srate handling capability
+Richard Luckett and Murray McGowan - Dec 6, 2016
+
+localmag
+Extend use of parameter SkipStationsNotInArc also for S phase
+Matteo Quintiliani    December 1, 2016
+
+gmew
+Ticket #559. http://earthworm.isti.com/trac/earthworm/ticket/559
+Fix call to logit().
+Add to gmew the error handle for WS_ERR_PARSE. Copy source from localmag.
+Matteo Quintiliani    November 11, 2016
+
+sniffwave
+Ticket #534. http://earthworm.isti.com/trac/earthworm/ticket/534
+Add help description for data and feed latency.
+Matteo Quintiliani    November 11, 2016
+
+gmew
+Ticket #555. http://earthworm.isti.com/trac/earthworm/ticket/555
+Fix for max number of stations maxSta.
+Matteo Quintiliani    November 4, 2016
+
+wave_serverV
+scn2scnl
+Ticket #695 http://earthworm.isti.com/trac/earthworm/ticket/695
+Fixed the SPARC 64-bit alignment traps.
+Larry Baker March 1, 2019
+
+
+ew2moledb
+* preserve query when error "Lost connection to MySQL server during query" occurs. (Error code: 2013)
+* preserve query when error "MySQL server has gone away" occurs. (Error code: 2006)
+* fix precision to millisecond in datetime fields
+Matteo Quintiliani - May 28, 2019
+
+
+
+<b><a name=config>CHANGES TO CONFIGURATION FILES and DESCRIPTOR FILES:</a></b>
+localmag.d
+Add parameter searchTimesTauSFunc, alternative for searchTimes
+searchTimesTauSFunc  K1 K2  A B  deltaA deltaB
+The time window for searching for peak amplitudes is:
+   <searchStartTime> A seconds before the Estimated_P_Times
+   <searchEndTime>   B seconds after
+                     Estimated_S_Times + ( K1 * ( 1 - exp( - TauS / K2 ) ) )
+                     where TauS = Estimated_S_Times - Origin_Time
+The time window for cutting traces is:
+   <traceStartTime> deltaA seconds before <searchStartTime>
+   <traceEndTime>   deltaB seconds after  <searchEndTime>
+example: searchTimesTauSFunc 40.0 30.0  1.0 1.0  19.0 9.0
+WARNING: searchTimesTauSFunc conflicts with searchTimes
+WARNING: traceTimes is ignored if searchTimesTauSFunc is used
+Matteo Quintiliani and Franco Mele    December 7, 2016
+
+hyp2000_mgr.d
+Add option to log HYPINV commands:
+LogFile    2            # 0 no log, >=1 errors, >=2 hypocenters, >=3 HYPINV commands
+Larry Baker February 20, 2019
+
+<b><a name=library> LIBRARY CHANGES: </a></b>
+
+massive makefile.nt and makefile.unix clean up by Larry Baker. Thanks Larry!!
+
+crypto
+encode64/decode64 via SHA-1 added for ewhtmemail use of Google Maps and signing
+This uses a GNU licensed version of codes from the Free Software Foundation
+Paul Friberg  July 2018 
+
+socket_ew
+Added wrapper functions setuptcpclient_ew() and setuptcpserver_ew()
+which eliminate boilerplate socket code and allow applications to
+be agnostic as to whether addresses are IPv4 or IPv6
+Alexander Schnackenberg November 26, 2018
+
+parse_ip_address:
+New library routines to properly parse IPv4 and IPv6 address strings
+Includes rewritten 'ip_in_same_subnet()' function to determine whether
+two addresses are in the same subnet
+Larry Baker March 16, 2018
+
+threads_ew
+Updated threading functions to use ew_thread_t types that correctly resolve
+to underlying opaque types, vs assuming the use of unsigned integers is correct
+across 32 bit and 64 bit systems
+Alexander Schnackenberg February 6, 2019
+
+<b><a name=reqs> MINIMUM SYSTEM REQUIREMENTS: </a></b>
+
+The Earthworm build has been tested on several versions of Linux, MacOS,
+Solaris, and Windows.  The Memphis test suite has been run to validate
+the results.
+
+The minimum system requirements are:
+
+A C90 compiler and a Fortran 90 compiler (optional on Windows)
+
+MacOS:   Apple gcc (clang), GNU gcc (probably works), GNU gfortran
+         No known restrictions
+Linux:   GNU gcc, GNU gfortran
+         No known restrictions
+Solaris: SunOS 5.10 or newer
+         Sun C 5.9 or newer, Sun Fortran 90 5.9 or newer
+Windows: Windows 7 or newer
+         Microsoft Visual Studio 2015, Update 3, or newer
+         Optional Intel Parallel Studio Fortran 2015, Update 4, or newer

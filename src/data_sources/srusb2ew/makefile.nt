@@ -1,0 +1,59 @@
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG = 1
+!ENDIF
+
+!include <Win32.Mak>
+
+CFLAGS  = $(cflags)    $(cdebug) $(cvarsmt)   $(GLOBALFLAGS)
+LDFLAGS = $(conlflags) $(ldebug) $(conlibsmt)
+
+B = $(EW_HOME)\$(EW_VERSION)\bin
+L = $(EW_HOME)\$(EW_VERSION)\lib
+
+# The following lines set the location of the SR USBxCH library
+# functions needed to compile srusb2ew.  Un-comment the first line
+# below when compiling from the Earthworm directory tree and the
+# second when compiling from the SR directory tree.
+
+SR_HOME = $(EW_HOME)\$(EW_VERSION)\src\data_sources\srusb2ew
+#SR_HOME = \SR
+
+USBXCH = $(SR_HOME)\USBXCH
+
+USBXCHINC = $(USBXCH)\Include
+USBXCHLIB = $(USBXCH)\Lib\SrUsbXch.c
+HELPERLIB = $(USBXCH)\Lib\SrHelper.c
+
+PDEF = /DSROS_WIN2K
+
+APP = srusb2ew
+
+OBJS = \
+	$(APP).obj \
+	SrHelper.obj \
+	SrUsbXch.obj
+
+EW_LIBS = /LIBPATH:$L libew_mt.lib
+
+$B\$(APP).exe: $(OBJS)
+	$(link) /out:$@ $(LDFLAGS) $(OBJS) $(EW_LIBS)
+
+$(APP).obj: $(APP).c
+	$(CC) $(CFLAGS) $(PDEF) /I$(USBXCHINC) $(APP).c
+
+SrUsbXch.obj: $(USBXCHLIB)
+	$(CC) $(CFLAGS) $(PDEF) /I$(USBXCHINC) $(USBXCHLIB)
+
+SrHelper.obj: $(HELPERLIB)
+	$(CC) $(CFLAGS) $(PDEF) /I$(USBXCHINC) $(HELPERLIB)
+
+
+# Clean-up rules
+clean: PHONY
+	-del a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-del $B\$(APP) $B\$(APP).exe
+
+PHONY:

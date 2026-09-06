@@ -1,0 +1,58 @@
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG = 1
+!ENDIF
+
+!include <Win32.Mak>
+
+CFLAGS  = $(cflags)    $(cdebug) $(cvarsmt)   $(GLOBALFLAGS)
+
+L = $(EW_HOME)\$(EW_VERSION)\lib
+
+OBJS = \
+	copyfile.obj \
+	dirops_ew.obj \
+	getavail.obj \
+	getsysname_ew.obj \
+	lockfile_ew.obj \
+	pipe.obj \
+	pipeconsole.obj \
+	sema_ew.obj \
+	sendmail.obj \
+	sendpage.obj \
+	sleep_ew.obj \
+	service_ew.obj \
+	socket_ew.obj \
+	startstop_winlib.obj \
+	threads_ew.obj \
+	time_ew.obj \
+	transport.obj \
+	wait_timer.obj
+
+all: objs rpc
+
+objs: $(OBJS)
+	copy *.obj $L
+
+rpc: PHONY
+	@pushd $@ & \
+		echo ---------- & \
+		for /f "delims=" %d in ( 'cd' ) do @echo Making $@ in: %d & \
+		$(MAKE) /$(MAKEFLAGS) /f makefile.nt & \
+	popd
+
+
+# Clean-up rules
+clean:	clean\here \
+	clean\rpc
+
+clean\here: PHONY
+	-del a.out core *.o *.obj *% *~
+
+clean\rpc: PHONY
+	-@pushd $(@F) & \
+		for /f "delims=" %d in ( 'cd' ) do @echo Cleaning in: %d & \
+		$(MAKE) /$(MAKEFLAGS) /f makefile.nt clean & \
+	popd
+
+PHONY:

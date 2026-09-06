@@ -1,0 +1,13 @@
+{
+    "waveserverHost": ["greendragon.isti.com", "127.0.0.1"],
+    "waveserverPort": [16027, 16027],
+
+    "ewaveHost": "127.0.0.1",
+    "ewavePort": 5000,
+
+    "plotColor": "black",
+
+	"width": 800,
+	"height": 125,
+	"dpi": 100
+}

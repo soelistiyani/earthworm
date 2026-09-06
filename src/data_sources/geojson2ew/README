@@ -1,0 +1,55 @@
+
+Welcome to the geojson2ew - geoJSON to Earthworm module.
+
+This release was compiled and tested for Lunux x86_64 on:
+Red Hat Enterprise Linux Server release 6.8 (Santiago)
+
+BUILD/INSTALL
+
+Compiling Libraries
+-------------------
+To build and run this module you need the following:
+
+o	Earthworm - Earthworm v7.9 64-bit.
+o 	RabbitMQ C AMQP client v0.8.0 (download tarball from here:
+        https://github.com/alanxz/rabbitmq-c/releases/tag/v0.8.0)
+o	Jansson JSON library version 2.7 (download tarball from here:
+        http://www.digip.org/jansson)
+
+The RabbitMQ C AMQP client and Jansson libraries should be built and installed using the instructions
+provided with the libraries. These libraries can be build using either 'cmake' or 'configure'.
+
+To build 32-bit versions of the libraries on a 64-bit linux system the CFLAGS="-m32" compiler flag needs to be set.
+With 'cmake' CFLAGS are set as follows:
+     cmake -DCMAKE_C_FLAGS="-m32" ..
+With 'configure' CFLAGS are set as follows:
+     configure CFLAGS="-m32"
+Any missing package dependencies must also be installed for 32-bit. e.g., openssl-devel.i686
+
+Compiling geojson2ew
+--------------------
+Note if you wish to use the socket version of the code only and not compile with RabbitMQ C then use the 'geojson2ew_socket' target in the makefile.
+However, it is highly recommended that you compile the 'geojson2ew' target with the specified RabbitMQ C library for ShakeAlert compatibility.
+
+Making geojson2ew under Linux, type:
+
+	make -f makefile.unix
+
+	
+Copy the geojson2ew.d and geojson2ew.desc files to the params directory specified
+in your earthworm installation and modify as needed. Avoid using inline comments
+in MAP_CHAN lines as this may cause crashes or other undesireable results.
+
+Add the geojson2ew module ID (MOD_GEOJSON2EW) to the earthworm configuration file (params/earthworm.d):
+ Module  MOD_GEOJSON2EW         57
+However, several different instances of 'geojson2ew' may be run simulataneously to get data from various data sources, so make up some module names, e.g.:
+ Module	  MOD_GEOJSON2EW_CI	206
+ Module	  MOD_GEOJSON2EW_NC	207
+ Module	  MOD_GEOJSON2EW_BK	208
+ Module   MOD_GEOJSON2EW_PW	209
+ Module	  MOD_GEOJSON2EW_RK	210
+
+Edit instID to match you institution ID, e.g.:
+ instId   INST_UCB
+
+Copy the geojson2ew binary to your earthworm bin directory.

@@ -1,0 +1,26 @@
+#
+# Dummy makefile - only used for cleaning things up
+#
+
+B = $(EW_HOME)/$(EW_VERSION)/bin
+
+APPS = \
+	$B/nt_clean_tree.exe \
+	$B/nt_comp.exe \
+	$B/nt_folder.exe \
+	$B/nt_folder2.exe \
+	$B/nt_make.exe \
+	$B/nt_make_subdirs.exe \
+	$B/nt_make_tree.exe
+
+default: FAIL
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-$(RM) $(APPS)
+
+PHONY:

@@ -1,0 +1,46 @@
+LINUX_FLAGS    = -lpthread
+SOLARIS_FLAGS  = -lnsl -lsocket -lrt -lpthread
+SPECIFIC_FLAGS = $($(PLATFORM)_FLAGS)
+
+CFLAGS = $(GLOBALFLAGS) -Ilibbgs
+
+B = $(EW_HOME)/$(EW_VERSION)/bin
+L = $(EW_HOME)/$(EW_VERSION)/lib
+
+APP = archman
+
+OBJS = $(APP).o
+
+EW_LIBS = \
+	$L/socket_ew.o \
+	$L/socket_ew_common.o \
+	$L/swap.o \
+	-L$L -lbgs -lew_mt
+
+$B/$(APP): $(OBJS) $L/libbgs.a
+	$(CC) -o $@ $(CFLAGS) $(OBJS) $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+$L/libbgs.a:
+	@cd libbgs && \
+		echo ---------- ; \
+		echo Making $(@F) in: `pwd` ; \
+		$(MAKE) -f makefile.unix
+
+
+# Clean-up rules
+clean:	clean/archman \
+	clean/libbgs
+
+clean/archman: PHONY
+	-$(RM) a.out core *.o *.obj *% *~ \
+	$(RM) lib/a.out lib/core lib/*.o lib/*.obj lib/*% lib/*~ lib/*.a 
+
+clean/libbgs: PHONY
+	-@cd libbgs && \
+		echo Cleaning in: `pwd` ; \
+		$(MAKE) -f makefile.unix clean
+
+clean_bin: PHONY
+	-$(RM) $B/$(APP) $B/$(APP).exe
+
+PHONY:

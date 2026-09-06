@@ -1,0 +1,50 @@
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG = 1
+!ENDIF
+
+!include <Win32.Mak>
+
+# ew_thread_t is defined in the Earthworm platform.h; it is not defined in the
+# LIB330 platform.h.  Because directories listed in /I options are searched
+# before directories in the INCLUDE environment variable,
+# /I$(EW_HOME)\$(EW_VERSION)\include must be added here ahead of
+# /I$(LIB330_DIR) here so the Earthworm platform.h is used instead of the
+# LIB330 platform.h.
+
+CFLAGS  = $(cflags)    $(cdebug) $(cvarsmt)   $(GLOBALFLAGS) \
+		/I$(EW_HOME)\$(EW_VERSION)\include \
+		/I$(LIB330_DIR) /DWIN32 /DX86_WIN32 /w24005
+LDFLAGS = $(conlflags) $(ldebug) $(conlibsmt)
+
+B = $(EW_HOME)\$(EW_VERSION)\bin
+L = $(EW_HOME)\$(EW_VERSION)\lib
+
+LIB330_DIR = $(EW_HOME)\$(EW_VERSION)\src\libsrc\lib330
+
+APP = q3302ew
+
+OBJS = \
+	$(APP).obj \
+	config.obj \
+	heart.obj \
+	lib330Interface.obj \
+	logging.obj \
+	options.obj
+
+LIB330 = /LIBPATH:$(LIB330_DIR) lib330.lib
+
+EW_LIBS = /LIBPATH:$L libew_mt.lib
+
+$B\$(APP).exe: $(OBJS)
+	$(link) /out:$@ $(LDFLAGS) $(OBJS) $(LIB330) $(EW_LIBS)
+
+
+# Clean-up rules
+clean: PHONY
+	-del a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-del $B\$(APP) $B\$(APP).exe
+
+PHONY:

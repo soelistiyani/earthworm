@@ -1,0 +1,12 @@
+#
+# Dummy makefile - only used for cleaning things up
+#
+
+default: FAIL
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+
+PHONY:

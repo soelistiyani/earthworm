@@ -1,0 +1,13 @@
+This directory contains the rtp2ew 2.1.0 2016.11.08 binaries 
+(rename them rtp2ew for your platform):
+
+rtp2ew_win32.exe  - Windows32 (compiled on AMD A6 with Win 7, Visual Studio 12)
+rtp2ew_win64.exe  - Windows64 (compiled on AMD A6 with Win 7, Visual Studio 12)
+rtp2ew_lin32  - Linux32 (compiled on AMD A6 with Ubuntu 14.04 LTS, GCC 4.8.4)
+rtp2ew_lin64  - Linux64 (compiled on AMD A6 with Ubuntu 14.04 LTS, GCC 4.8.4)
+rtp2ew_mac32  - Macosx32 (compiled on MAC mini Intel with Macos 10.12 Sierra, GCC 6.20)
+rtp2ew_mac64  - Macosx64 (compiled on MAC mini Intel with Macos 10.12 Sierra, GCC 6.20)
+rtp2ew_cent32  - Centos32 (compiled on Intel Xeon with Centos6.8, GCC 4.4.7)
+rtp2ew_cent64  - Centos64 (compiled on Intel Xeon with Centos6.8, GCC 4.4.7)
+
+Contact Trimble to have any other Linux flavors built.

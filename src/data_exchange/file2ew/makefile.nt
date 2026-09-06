@@ -1,0 +1,65 @@
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG = 1
+!ENDIF
+
+!include <Win32.Mak>
+
+CFLAGS  = $(cflags)    $(cdebug) $(cvarsmt)   $(GLOBALFLAGS)
+LDFLAGS = $(conlflags) $(ldebug) $(conlibsmt)
+
+B = $(EW_HOME)\$(EW_VERSION)\bin
+L = $(EW_HOME)\$(EW_VERSION)\lib
+
+OBJS = file2ew.obj
+
+OBJS_SM = \
+	$(OBJS) \
+	$L/rw_strongmotionII.obj
+
+EW_LIBS = \
+	/LIBPATH:$L \
+	dirops_ew.obj \
+	k2evt2ew.obj \
+	swap.obj \
+	libew_mt.lib
+
+all:	$B/file2ew.exe \
+	$B/sm_csmip2ew.exe \
+	$B/sm_nsmp2ew.exe \
+	$B/sm_redi2ew.exe \
+	$B/sm_terra2ew.exe \
+	$B/sm_tremor2ew.exe
+
+$B\file2ew.exe: $(OBJS) raw2ew.obj
+	$(link) /out:$@ $(LDFLAGS) $(OBJS) raw2ew.obj $(EW_LIBS)
+
+$B\sm_csmip2ew.exe: $(OBJS_SM) csmip2ew.obj
+	$(link) /out:$@ $(LDFLAGS) $(OBJS_SM) csmip2ew.obj $(EW_LIBS)
+
+$B\sm_nsmp2ew.exe: $(OBJS_SM) nsmp2ew.obj
+	$(link) /out:$@ $(LDFLAGS) $(OBJS_SM) nsmp2ew.obj $(EW_LIBS)
+
+$B\sm_redi2ew.exe: $(OBJS_SM) redi2ew.obj
+	$(link) /out:$@ $(LDFLAGS) $(OBJS_SM) redi2ew.obj $(EW_LIBS)
+
+$B\sm_terra2ew.exe: $(OBJS_SM) terra2ew.obj
+	$(link) /out:$@ $(LDFLAGS) $(OBJS_SM) terra2ew.obj $(EW_LIBS)
+
+$B\sm_tremor2ew.exe: $(OBJS_SM) tremor2ew.obj
+	$(link) /out:$@ $(LDFLAGS) $(OBJS_SM) tremor2ew.obj $(EW_LIBS)
+
+
+# Clean-up rules
+clean: PHONY
+	-del a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-del $B/file2ew      $B/file2ew.exe
+	-del $B/sm_csmip2ew  $B/sm_csmip2ew.exe
+	-del $B/sm_nsmp2ew   $B/sm_nsmp2ew.exe
+	-del $B/sm_redi2ew   $B/sm_redi2ew.exe
+	-del $B/sm_terra2ew  $B/sm_terra2ew.exe
+	-del $B/sm_tremor2ew $B/sm_tremor2ew.exe
+
+PHONY:

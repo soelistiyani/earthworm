@@ -1,0 +1,41 @@
+LINUX_FLAGS    = -lpthread
+SOLARIS_FLAGS  = -lrt -lpthread
+SPECIFIC_FLAGS = $($(PLATFORM)_FLAGS)
+
+CFLAGS = $(GLOBALFLAGS)
+
+B = $(EW_HOME)/$(EW_VERSION)/bin
+L = $(EW_HOME)/$(EW_VERSION)/lib
+H = ../hyp2000
+
+APP = hyp2000_mgr
+
+F_SRCS = hypoinv_wrapper.f90 hypoinv.for \
+	              $H/hybda.for  $H/hycmd.for  $H/hysta.for  $H/hydel.for  $H/hyate.for  \
+	$H/hyfmc.for  $H/hycal.for  $H/hyxmc.for  $H/hycrh.for  $H/hycrt.for  $H/hystl.for  \
+	$H/hyopen.for $H/hyinit.for $H/hyphs.for  $H/hysou.for  $H/hytrl.for  $H/hyloc.for  \
+	$H/hysol.for  $H/hysvd.f    $H/hytra.for  $H/hytrh.for  $H/hytrt.for  $H/hymag.for  \
+	$H/hyrep.for  $H/hylst.for  $H/hysum.for  $H/hyinp.for  $H/hypro.for  $H/medwt.for  \
+	$H/utmcal.for $H/hydelt.f   $H/hyedit.f   $H/hytime.f   $H/hybeg.f    $H/hypref.for \
+	$H/hymagp.for $H/linv.for   $H/linvol.for $H/hyfile.for $H/hylinv.for $H/hylin.for  \
+	$H/hycre.for  $H/hytre.for  $H/trvcon.for $H/allsubs.f  $H/hydatum.for
+
+EW_LIBS = \
+	$L/pipe.o \
+	$L/read_arc.o \
+	-L$L -lew_mt
+
+$B/$(APP): $(APP).o $(F_SRCS) $H/common.inc
+	$(FC) -o $@ $(FC_MAIN_IS_C) $(FFLAGS) -I$H $(APP).o $(F_SRCS) \
+		$(EW_LIBS) $(SPECIFIC_FLAGS)
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-$(RM) $B/$(APP) $B/$(APP).exe
+	-$(RM) -r $B/$(APP).dSYM
+
+PHONY:

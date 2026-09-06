@@ -1,0 +1,70 @@
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG=1
+!ENDIF
+
+!include <Win32.Mak>
+
+CFLAGS  = $(cflags)    $(cdebug) $(cvarsmt)   $(GLOBALFLAGS) /I$(NIDAQ_INCLUDE)
+LDFLAGS = $(conlflags) $(ldebug) $(conlibsmt)
+
+B = $(EW_HOME)\$(EW_VERSION)\bin
+L = $(EW_HOME)\$(EW_VERSION)\lib
+U = $(EW_HOME)\$(EW_VERSION)\src\libsrc\util
+W = $(EW_HOME)\$(EW_VERSION)\src\libsrc\winnt
+
+APP = adsend
+
+OBJS = \
+	$(APP).obj \
+	comatose.obj \
+	console.obj \
+	errors.obj \
+	getconfig.obj \
+	guidechk.obj \
+	heartbeat.obj \
+	irige.obj \
+	nidaq_ew.obj \
+	print_gmtime.obj \
+	threads.obj
+
+EW_LIBS = \
+	/LIBPATH:$L \
+	chron3.obj \
+	getutil.obj \
+	kom.obj \
+	logit_mt.obj \
+	sleep_ew.obj \
+	time_ew.obj \
+	transport.obj
+
+# Setup paths for NI-DAQ includes and libraries
+# NOTE: Different NI-DAQ versions have different default
+#       install directory names. Uncomment the lines
+#       appropriate to the version you are running!
+#
+# NI-DAQ Verion 5.0:
+# NIDAQ_INCLUDE=c:\nidaqnt\Include
+# NIDAQ_LIB=c:\nidaqnt\Lib
+#
+# NI-DAQ VERSION 6.5.1
+# NIDAQ_INCLUDE=c:\ni-daq\Include
+# NIDAQ_LIB=c:\ni-daq\Lib
+#
+# NI-DAQ VERSION 6.9.1
+NIDAQ_INCLUDE = "c:\Program Files\National Instruments\NI-DAQ\Include"
+NIDAQ_LIB     = "c:\Program Files\National Instruments\NI-DAQ\Lib"
+
+$B\$(APP).exe: $(OBJS)
+	$(link) /out:$@ $(LDFLAGS) $(OBJS) \
+		/LIBPATH:$(NIDAQ_LIB) nidex32.lib nidaq32.lib $(EW_LIBS)
+
+
+# Clean-up rules
+clean: PHONY
+	-del a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-del $B\$(APP) $B\$(APP).exe
+
+PHONY:

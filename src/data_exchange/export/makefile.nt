@@ -1,0 +1,85 @@
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG = 1
+!ENDIF
+
+!include <Win32.Mak>
+
+CFLAGS  = $(cflags)    $(cdebug) $(cvarsmt)   $(GLOBALFLAGS)
+LDFLAGS = $(conlflags) $(ldebug) $(conlibsmt)
+
+B = $(EW_HOME)\$(EW_VERSION)\bin
+L = $(EW_HOME)\$(EW_VERSION)\lib
+
+EW_LIBS = \
+	/LIBPATH:$L \
+	getsysname_ew.obj \
+	socket_ew.obj \
+	socket_ew_common.obj \
+	swap.obj \
+	libmseed.lib \
+	libew_mt.lib
+
+OBJS = export.obj \
+	$L/mem_circ_queue.obj
+
+OBJS_PRI = \
+	export_scn_pri.obj \
+	$L/priority_queue.obj
+
+OBJS_ACTV = \
+	export_actv.obj \
+	$L/mem_circ_queue.obj
+
+OBJS_ACK = \
+	export_ack.obj \
+	$L/mem_circ_queue.obj
+
+all:	$B\export_generic.exe \
+	$B\export_scnl.exe \
+	$B\export_scnl_pri.exe \
+	$B\export_gen_actv.exe \
+	$B\export_scnl_actv.exe \
+	$B\export_ack.exe \
+	$B\export_scnl_ack.exe
+
+$B\export_generic.exe: $(OBJS) genericfilter.obj
+	$(link) /out:$@ $(LDFLAGS) $(OBJS) genericfilter.obj $(EW_LIBS)
+
+$B\export_scnl.exe: $(OBJS) scnfilter.obj
+	$(link) /out:$@ $(LDFLAGS) $(OBJS) scnfilter.obj \
+		$L\rdpickcoda.obj $(EW_LIBS)
+
+$B\export_scnl_pri.exe: $(OBJS_PRI) scnfilter.obj
+	$(link) /out:$@ $(LDFLAGS) $(OBJS_PRI) scnfilter.obj \
+		$L\rdpickcoda.obj $(EW_LIBS)
+
+$B\export_gen_actv.exe: $(OBJS_ACTV) genericfilter.obj
+	$(link) /out:$@ $(LDFLAGS) $(OBJS_ACTV) genericfilter.obj $(EW_LIBS)
+
+$B\export_scnl_actv.exe: $(OBJS_ACTV) scnfilter.obj
+	$(link) /out:$@ $(LDFLAGS) $(OBJS_ACTV) scnfilter.obj \
+		$L\rdpickcoda.obj $(EW_LIBS)
+
+$B\export_ack.exe: $(OBJS_ACK) genericfilter.obj
+	$(link) /out:$@ $(LDFLAGS) $(OBJS_ACK) genericfilter.obj $(EW_LIBS)
+
+$B\export_scnl_ack.exe: $(OBJS_ACK) scnfilter.obj
+	$(link) /out:$@ $(LDFLAGS) $(OBJS_ACK) scnfilter.obj \
+		$L\rdpickcoda.obj $(EW_LIBS)
+
+
+# Clean-up rules
+clean: PHONY
+	-del a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-del $B\export_generic   $B\export_generic.exe
+	-del $B\export_scnl      $B\export_scnl.exe
+	-del $B\export_scnl_pri  $B\export_scnl_pri.exe
+	-del $B\export_gen_actv  $B\export_gen_actv.exe
+	-del $B\export_scnl_actv $B\export_scnl_actv.exe
+	-del $B\export_ack       $B\export_ack.exe
+	-del $B\export_scnl_ack  $B\export_scnl_ack.exe
+
+PHONY:

@@ -1,0 +1,65 @@
+# The MATLAB mex functions do not support SCNL LOC codes
+
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG = 1
+!ENDIF
+
+!include <Win32.Mak>
+
+CFLAGS  = $(cflags)    $(cdebug) $(cvarsmt)   $(GLOBALFLAGS) \
+		/I$(EW_HOME)\$(EW_VERSION)\src\diagnostic_tools/wave_probe \
+		/I"C:\Program Files\MATLAB\R2015a\extern\include" \
+		/DMATLAB_MEX_FILE
+LDFLAGS = $(conlflags) $(ldebug) $(conlibsmt) /EXPORT:mexFunction
+
+B = $(EW_HOME)\$(EW_VERSION)\bin
+L = $(EW_HOME)\$(EW_VERSION)\lib
+
+APP1 = mGetMenu
+APP2 = mGetAscii
+
+O1 = $(APP1).obj
+O2 = $(APP2).obj
+
+EW_LIBS = \
+	/LIBPATH:$L \
+	ahputaway.obj \
+	dirops_ew.obj \
+	geo_to_km.obj \
+	gseputaway.obj \
+	putaway.obj \
+	sacputaway.obj \
+	seiputaway.obj \
+	seiutils.obj \
+	socket_ew.obj \
+	socket_ew_common.obj \
+	sema_ew.obj \
+	sudsputaway.obj \
+	swap.obj \
+	tankputaway.obj \
+	ws_clientII.obj \
+	xdr.obj \
+	xdr_stdio.obj \
+	xdr_float.obj \
+	xdr_array.obj \
+	libew_mt.lib
+
+all:	$B\$(APP1).dll \
+	$B\$(APP2).dll
+
+$B\$(APP1).dll: $(O1)
+	$(link) /out:$@ $(LDFLAGS) $(O1) $(EW_LIBS)
+
+$B\$(APP2).dll: $(O2)
+	$(link) /out:$@ $(LDFLAGS) $(O2) $(EW_LIBS)
+
+
+# Clean-up rules
+clean: PHONY
+	-del a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-del $B\mGetMenu.dll $B\mGetBinary.dll $B\mGetAscii.dll
+
+PHONY:

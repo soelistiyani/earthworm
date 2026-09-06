@@ -1,0 +1,127 @@
+# The single-threaded libew is no longer used; everything uses the multi-threaded libew_mt now
+
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG = 1
+!ENDIF
+
+!include <Win32.Mak>
+
+L = $(EW_HOME)\$(EW_VERSION)\lib
+
+NT_MODULES = \
+	earlybird \
+	lib330 \
+	libcrypto \
+	libdali \
+	libgd \
+	util \
+	winnt
+
+LIBEW_NT_MODULES = \
+	util\chron3.obj \
+	util\earthworm_defs.obj \
+	util\getutil.obj \
+	util\kom.obj \
+	winnt\sleep_ew.obj \
+	winnt\time_ew.obj \
+	winnt\transport.obj
+
+#LIBEW_MODULES = \
+#	$(LIBEW_NT_MODULES) \
+#	util\logit.obj
+
+LIBEW_MT_MODULES = \
+	$(LIBEW_NT_MODULES) \
+	util\logit_mt.obj \
+	winnt\sema_ew.obj \
+	winnt\threads_ew.obj
+
+#all:	$(NT_MODULES) \
+#	$L\libew.lib \
+#	$L\libew_mt.lib
+all:	$(NT_MODULES) \
+	$L\libew_mt.lib
+
+earlybird \
+lib330 \
+libcrypto \
+libdali \
+libgd \
+util \
+winnt: PHONY
+	@pushd $@ & \
+		echo ---------- & \
+		for /f "delims=" %d in ( 'cd' ) do @echo Making $@ in: %d & \
+		$(MAKE) /$(MAKEFLAGS) /f makefile.nt & \
+	popd
+
+#$L\libew.lib: $(LIBEW_MODULES)
+#	@echo ----------
+#	@echo Making libew.lib
+#	lib /nologo /out:$@ $(LIBEW_MODULES)    $(WIN_FLUSH_OBJ)
+
+$L\libew_mt.lib: $(LIBEW_MT_MODULES)
+	@echo ----------
+	@echo Making libew_mt.lib
+	lib /nologo /out:$@ $(LIBEW_MT_MODULES) $(WIN_FLUSH_OBJ)
+
+
+# Clean-up rules
+clean:	clean\here \
+	clean\lib \
+	clean\earlybird \
+	clean\lib330 \
+	clean\libcrypto \
+	clean\libdali \
+	clean\libgd \
+	clean\qlib2 \
+	clean\solaris \
+	clean\unix \
+	clean\util \
+	clean\uw \
+	clean\winnt
+
+clean\here: PHONY
+	-del libew*.a libew*.lib
+
+clean\lib: PHONY
+	-@pushd $L & \
+		for /f "delims=" %d in ( 'cd' ) do @echo Cleaning in: %d & \
+		echo del a.out core lib*.a lib*.lib *.o *.obj *% *~ & \
+		del a.out core lib*.a lib*.lib *.o *.obj *% *~ & \
+	popd
+
+clean\earlybird \
+clean\lib330 \
+clean\libcrypto \
+clean\libdali \
+clean\libgd \
+clean\solaris \
+clean\unix \
+clean\util \
+clean\uw \
+clean\winnt: PHONY
+	-@pushd $(@F) & \
+		for /f "delims=" %d in ( 'cd' ) do @echo Cleaning in: %d & \
+		$(MAKE) /$(MAKEFLAGS) /f makefile.nt clean & \
+	popd
+
+clean\qlib2: PHONY
+	-@pushd qlib2 & \
+		for /f "delims=" %d in ( 'cd' ) do @echo Cleaning in: %d & \
+		$(MAKE) /$(MAKEFLAGS) /f makefile.nt clean & \
+		echo del /q lib_ew\* & \
+		del /q lib_ew\* & \
+	popd
+
+clean_bin: \
+	clean_bin\libgd
+
+clean_bin\libgd: PHONY
+	-@pushd $(@F) & \
+		for /f "delims=" %d in ( 'cd' ) do @echo Cleaning binaries in: %d & \
+		$(MAKE) /$(MAKEFLAGS) /f makefile.nt clean_bin & \
+	popd
+
+PHONY:

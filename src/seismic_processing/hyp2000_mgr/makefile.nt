@@ -1,0 +1,52 @@
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG = 1
+!ENDIF
+
+!include <Win32.Mak>
+
+CFLAGS  = $(cflags)    $(cdebug) $(cvarsmt)   $(GLOBALFLAGS)
+LDFLAGS = $(conlflags) $(ldebug) $(conlibsmt)
+
+B = $(EW_HOME)\$(EW_VERSION)\bin
+L = $(EW_HOME)\$(EW_VERSION)\lib
+H = ..\hyp2000
+
+APP = hyp2000_mgr
+
+F_SRCS = hypoinv_wrapper.f90 hypoinv.for \
+	              $H/hybda.for  $H/hycmd.for  $H/hysta.for  $H/hydel.for  $H/hyate.for  \
+	$H/hyfmc.for  $H/hycal.for  $H/hyxmc.for  $H/hycrh.for  $H/hycrt.for  $H/hystl.for  \
+	$H/hyopen.for $H/hyinit.for $H/hyphs.for  $H/hysou.for  $H/hytrl.for  $H/hyloc.for  \
+	$H/hysol.for  $H/hysvd.f    $H/hytra.for  $H/hytrh.for  $H/hytrt.for  $H/hymag.for  \
+	$H/hyrep.for  $H/hylst.for  $H/hysum.for  $H/hyinp.for  $H/hypro.for  $H/medwt.for  \
+	$H/utmcal.for $H/hydelt.f   $H/hyedit.f   $H/hytime.f   $H/hybeg.f    $H/hypref.for \
+	$H/hymagp.for $H/linv.for   $H/linvol.for $H/hyfile.for $H/hylinv.for $H/hylin.for  \
+	$H/hycre.for  $H/hytre.for  $H/trvcon.for $H/allsubs.f  $H/hydatum.for
+
+EW_LIBS = \
+	/LIBPATH:$L \
+	pipe.obj \
+	read_arc.obj \
+	libew_mt.lib
+
+SPECIFIC_FLAGS = \
+	/NODEFAULTLIB:libc \
+	/DEFAULTLIB:libifcoremt \
+	/NODEFAULTLIB:libifcore \
+	/DEFAULTLIB:libmmt
+
+$B\$(APP).exe: $(APP).obj $(F_SRCS) $H/common.inc
+	$(FC) /exe:$@ $(FFLAGS) /I$H $(APP).obj $(F_SRCS) \
+		/link $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+
+# Clean-up rules
+clean: PHONY
+	-del a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-del $B\$(APP) $B\$(APP).exe
+	-rmdir /S /Q $B\$(APP).dSYM
+
+PHONY:

@@ -1,0 +1,13 @@
+#
+# Dummy makefile - only used for cleaning things up
+#
+
+default: FAIL
+
+
+# Clean-up rules
+clean: PHONY
+	-del a.out core *.o *.obj *% *~
+	-del libuw.a libuw.lib
+
+PHONY:

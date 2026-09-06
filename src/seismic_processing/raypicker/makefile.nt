@@ -1,0 +1,58 @@
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG=1
+!ENDIF
+
+!include <Win32.Mak>
+
+CFLAGS  = $(cflags)    $(cdebug) $(cvarsmt)   $(GLOBALFLAGS)
+LDFLAGS = $(conlflags) $(ldebug) $(conlibsmt)
+
+B = $(EW_HOME)\$(EW_VERSION)\bin
+L = $(EW_HOME)\$(EW_VERSION)\lib
+
+APP = raypicker
+
+OBJS = \
+	$(APP).obj \
+	compare.obj \
+	config.obj \
+	debug.obj \
+	pick_channel_info.obj \
+	pick_series.obj \
+	stalist_parse.obj \
+	scnl_list_utils.obj \
+	rate_constants.obj \
+	ray_trigger.obj \
+	rp_messaging.obj \
+	stalist.obj \
+	symmetry.obj \
+	tracebuf2double.obj
+
+EW_LIBS = \
+	/LIBPATH:$L \
+	butterworth.obj \
+	complex_math.obj \
+	convertInstResponse.obj \
+	global_msg.obj \
+	global_pick_rw.obj \
+	ioc_filter.obj \
+	mem_circ_queue.obj \
+	residue.obj \
+	swap.obj \
+	transferFunction.obj \
+	watchdog_client.obj \
+	libew_mt.lib
+
+$B\$(APP).exe: $(OBJS)
+	$(link) /out:$@ $(LDFLAGS) $(OBJS) $(EW_LIBS)
+
+
+# Clean-up rules
+clean: PHONY
+	-del a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-del $B\$(APP) $B\$(APP).exe
+
+PHONY:

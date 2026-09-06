@@ -1,0 +1,57 @@
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG = 1
+!ENDIF
+
+!include <Win32.Mak>
+
+CFLAGS  = $(cflags)    $(cdebug) $(cvarsmt)   $(GLOBALFLAGS) /DWIN32
+LDFLAGS = $(conlflags) $(ldebug) $(conlibsmt)
+
+B = $(EW_HOME)\$(EW_VERSION)\bin
+L = $(EW_HOME)\$(EW_VERSION)\lib
+
+APP = ws2ew
+
+OBJS = \
+	Ws2Ew.obj \
+	getconfig.obj \
+	Ws2EwUtils.obj
+
+LIB_PSN = /LIBPATH:mseed libpsnms.lib
+
+EW_LIBS = \
+	/LIBPATH:$L \
+	socket_ew.obj \
+	socket_ew_common.obj \
+	mem_circ_queue.obj \
+	libew_mt.lib
+
+$B\Ws2Ew.exe: $(OBJS) mseed\libpsnms.lib
+	link /out:$@ $(LDFLAGS) $(OBJS) $(LIB_PSN) $(EW_LIBS)
+
+mseed\libpsnms.lib:
+	@pushd mseed & \
+		echo ---------- & \
+		for /f "delims=" %d in ( 'cd' ) do @echo Making $@ in: %d & \
+		$(MAKE) /$(MAKEFLAGS) /f makefile.nt & \
+	popd
+
+
+# Clean-up rules
+clean:	clean\here \
+	clean\mseed
+
+clean\here: PHONY
+	-del a.out core *.o *.obj *% *~
+
+clean\mseed: PHONY
+	-@pushd mseed & \
+		for /f "delims=" %d in ( 'cd' ) do @echo Cleaning in: %d & \
+		$(MAKE) /$(MAKEFLAGS) /f makefile.nt clean & \
+	popd
+
+clean_bin: PHONY
+	-del $B\$(APP) $B\$(APP).exe
+
+PHONY:

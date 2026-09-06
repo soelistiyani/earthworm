@@ -1,0 +1,35 @@
+LINUX_FLAGS    = -lm -lpthread
+SOLARIS_FLAGS  = -lm -lnsl -lsocket -lrt -lpthread
+SPECIFIC_FLAGS = $($(PLATFORM)_FLAGS)
+
+CFLAGS = $(GLOBALFLAGS) -I$(QLIB_DIR)
+
+B = $(EW_HOME)/$(EW_VERSION)/bin
+L = $(EW_HOME)/$(EW_VERSION)/lib
+
+QLIB_DIR = $(EW_HOME)/$(EW_VERSION)/src/libsrc/qlib2
+
+APP = nq2pgm
+
+OBJS = main.o
+
+QLIB_LIB = -L$(QLIB_DIR)/lib_ew -lqlib2nl
+
+EW_LIBS = \
+	$L/dirops_ew.o \
+	$L/rw_strongmotionII.o \
+	-L$L -lew_mt
+
+# IGD 2006/11/16 Note that we use qlib2nl: no-leap-seconds version of Qlib2
+$B/nq2pgm: $(OBJS)
+	$(CC) -o $@ $(OBJS) $(QLIB_LIB) $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-$(RM) $B/$(APP) $B/$(APP).exe
+
+PHONY:

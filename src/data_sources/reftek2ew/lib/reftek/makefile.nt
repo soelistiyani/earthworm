@@ -1,0 +1,36 @@
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG = 1
+!ENDIF
+
+!include <Win32.Mak>
+
+CFLAGS  = $(cflags)    $(cdebug) $(cvarsmt)   $(GLOBALFLAGS) /O /I..\.. /DWINNT
+
+OBJS = \
+	ad.obj \
+	cd.obj \
+	com.obj \
+	dcomp.obj \
+	ds.obj \
+	dt.obj \
+	eh.obj \
+	et.obj \
+	om.obj \
+	sc.obj \
+	sh.obj \
+	steim.obj \
+	reftek_string.obj \
+	testlib.obj \
+	type.obj
+
+..\libreftek.lib: $(OBJS)
+	lib /nologo /out:$@ $(OBJS)
+
+
+# Clean-up rules
+clean: PHONY
+	-del a.out core *.o *.obj *% *~
+	-del ..\libreftek.a ..\libreftek.lib
+
+PHONY:

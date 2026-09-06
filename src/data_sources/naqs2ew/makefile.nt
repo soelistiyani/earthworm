@@ -1,0 +1,60 @@
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG = 1
+!ENDIF
+
+!include <Win32.Mak>
+
+# added -D_NTSDK to enable definition of getpid() as _getpid() LDD.
+CFLAGS  = $(cflags)    $(cdebug) $(cvarsmt)   $(GLOBALFLAGS) /D_NTSDK
+LDFLAGS = $(conlflags) $(ldebug) $(conlibsmt)
+
+B = $(EW_HOME)\$(EW_VERSION)\bin
+L = $(EW_HOME)\$(EW_VERSION)\lib
+
+OBJS = \
+	crc32.obj \
+	nmx_api.obj \
+	nmxp_packet.obj \
+	nmxsrv_socket.obj
+
+EW_LIBS = \
+	/LIBPATH:$L \
+	socket_ew.obj \
+	swap.obj \
+	socket_ew_common.obj \
+	libew_mt.lib
+
+all: $B\naqs2ew.exe $B\naqssoh.exe $B\naqsserTG.exe $B\getmenu-nmx.exe
+
+$B\naqs2ew.exe: naqs2ew.obj naqschassis.obj channels.obj $(OBJS)
+	$(link) /out:$@ $(LDFLAGS) naqs2ew.obj naqschassis.obj channels.obj $(OBJS) \
+		$(EW_LIBS)
+
+$B\naqssoh.exe: naqssoh.obj naqschassis.obj sohchannels.obj $(OBJS)
+	$(link) /out:$@ $(LDFLAGS) naqssoh.obj naqschassis.obj sohchannels.obj $(OBJS) \
+		$(EW_LIBS)
+
+$B\naqsserTG.exe: naqsserTG.obj naqschassis.obj serchannels.obj $(OBJS)
+	$(link) /out:$@ $(LDFLAGS) naqsserTG.obj naqschassis.obj serchannels.obj $(OBJS) \
+		$(EW_LIBS)
+
+$B\getmenu-nmx.exe: getmenu-nmx.obj $(OBJS)
+	$(link) /out:$@ $(LDFLAGS) getmenu-nmx.obj $(OBJS) $(EW_LIBS)
+
+$B\dsclient.exe: dschassis.obj $(OBJS)
+	$(link) /out:$@ $(LDFLAGS) dschassis.obj $(OBJS) $(EW_LIBS)
+
+
+# Clean-up rules
+clean: PHONY
+	-del a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-del $B\naqs2ew     $B\naqs2ew.exe
+	-del $B\naqssoh     $B\naqssoh.exe
+	-del $B\naqsserTG   $B\naqsserTG.exe
+	-del $B\getmenu-nmx $B\getmenu-nmx.exe
+	-del $B\dsclient    $B\dsclient.exe
+
+PHONY:

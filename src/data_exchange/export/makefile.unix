@@ -1,0 +1,83 @@
+LINUX_FLAGS    = -lm -lpthread
+SOLARIS_FLAGS  = -lm -lnsl -lsocket -lrt -lpthread
+SPECIFIC_FLAGS = $($(PLATFORM)_FLAGS)
+
+CFLAGS = $(GLOBALFLAGS)
+
+B = $(EW_HOME)/$(EW_VERSION)/bin
+L = $(EW_HOME)/$(EW_VERSION)/lib
+
+EW_LIBS = \
+	$L/getsysname_ew.o \
+	$L/socket_ew.o \
+	$L/socket_ew_common.o \
+	$L/swap.o \
+	-L$L -lmseed -lew_mt
+
+OBJS = \
+	export.o \
+	$L/mem_circ_queue.o
+
+OBJS_PRI = \
+	export_scn_pri.o \
+	$L/priority_queue.o
+
+OBJS_ACTV = \
+	export_actv.o \
+	$L/mem_circ_queue.o
+
+OBJS_ACK = \
+	export_ack.o \
+	$L/mem_circ_queue.o
+
+all:	$B/export_generic \
+	$B/export_scnl \
+	$B/export_scnl_pri \
+	$B/export_gen_actv \
+	$B/export_scnl_actv \
+	$B/export_ack \
+	$B/export_scnl_ack
+
+$B/export_generic: $(OBJS) genericfilter.o
+	$(CC) -o $@ $(CFLAGS) $(OBJS) genericfilter.o \
+		$(EW_LIBS) $(SPECIFIC_FLAGS)
+
+$B/export_scnl: $(OBJS) scnfilter.o
+	$(CC) -o $@ $(CFLAGS) $(OBJS) scnfilter.o \
+		$L/rdpickcoda.o $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+$B/export_scnl_pri: $(OBJS_PRI) scnfilter.o
+	$(CC) -o $@ $(CFLAGS) $(OBJS_PRI) scnfilter.o \
+		$L/rdpickcoda.o $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+$B/export_gen_actv: $(OBJS_ACTV) genericfilter.o
+	$(CC) -o $@ $(CFLAGS) $(OBJS_ACTV) genericfilter.o \
+		$(EW_LIBS) $(SPECIFIC_FLAGS)
+
+$B/export_scnl_actv: $(OBJS_ACTV) scnfilter.o
+	$(CC) -o $@ $(CFLAGS) $(OBJS_ACTV) scnfilter.o \
+		$L/rdpickcoda.o $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+$B/export_ack: $(OBJS_ACK) genericfilter.o
+	$(CC) -o $@ $(CFLAGS) $(OBJS_ACK) genericfilter.o \
+		$(EW_LIBS) $(SPECIFIC_FLAGS)
+
+$B/export_scnl_ack: $(OBJS_ACK) scnfilter.o
+	$(CC) -o $@ $(CFLAGS) $(OBJS_ACK) scnfilter.o \
+		$L/rdpickcoda.o $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-$(RM) $B/export_generic   $B/export_generic.exe
+	-$(RM) $B/export_scnl      $B/export_scnl.exe
+	-$(RM) $B/export_scnl_pri  $B/export_scnl_pri.exe
+	-$(RM) $B/export_gen_actv  $B/export_gen_actv.exe
+	-$(RM) $B/export_scnl_actv $B/export_scnl_actv.exe
+	-$(RM) $B/export_ack       $B/export_ack.exe
+	-$(RM) $B/export_scnl_ack  $B/export_scnl_ack.exe
+
+PHONY:

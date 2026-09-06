@@ -1,0 +1,40 @@
+# socket_sol.c won't compile on Linux, and there is no socket_lnx.c
+# It is not known whether the Windows version works
+
+LINUX_FLAGS    = -lpthread
+SOLARIS_FLAGS  = -lnsl -lsocket -lrt -lpthread
+SPECIFIC_FLAGS = $($(PLATFORM)_FLAGS)
+
+CFLAGS = $(GLOBALFLAGS)
+
+B = $(EW_HOME)/$(EW_VERSION)/bin
+L = $(EW_HOME)/$(EW_VERSION)/lib
+
+APP = sendfilemt
+
+OBJS = \
+	$(APP).o \
+	config.o \
+	fopen_sol.o \
+	socket.o \
+	socket_sol.o \
+	status.o \
+	thread.o \
+	thread_unix.o
+
+EW_LIBS = \
+	$L/dirops_ew.o \
+	-L$L -lew_mt
+
+$B/$(APP): $(OBJS)
+	$(CC) -o $@ $(CFLAGS) $(OBJS) $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-$(RM) $B/$(APP) $B/$(APP).exe
+
+PHONY:

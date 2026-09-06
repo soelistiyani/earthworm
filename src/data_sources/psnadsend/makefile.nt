@@ -1,0 +1,78 @@
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG=1
+!ENDIF
+
+!include <Win32.Mak>
+
+CFLAGS   = $(cflags)    $(cdebug) $(cvarsmt)   $(GLOBALFLAGS)
+CPPFLAGS = $(CFLAGS)
+LDFLAGS  = $(conlflags) $(ldebug) $(conlibsmt)
+
+B = $(EW_HOME)\$(EW_VERSION)\bin
+L = $(EW_HOME)\$(EW_VERSION)\lib
+D = PsnAdBoard
+
+APP = psnadsend
+
+OBJS = \
+	PsnAdSend.obj \
+	PsnAdUtils.obj \
+	filter.obj \
+	getconfig.obj
+
+AD_LIBS = /LIBPATH:$D PSNADBoardEw.lib
+
+EW_LIBS = \
+	/LIBPATH:$L \
+	getutil.obj \
+	kom.obj \
+	logit_mt.obj \
+	sleep_ew.obj \
+	time_ew.obj \
+	transport.obj \
+	libew_mt.lib
+
+$B\$(APP).exe: $(OBJS) $D/PSNADBoardEw.lib
+	$(link) /out:$@ $(LDFLAGS) $(OBJS) $(AD_LIBS) $(EW_LIBS)
+
+PsnAdSend.obj:	PsnAdSend.cpp  PsnAdSend.h
+PsnAdUtils.obj:	PsnAdUtils.cpp PsnAdSend.h
+filter.obj:	filter.cpp     PsnAdSend.h
+getconfig.obj:	getconfig.cpp  PsnAdSend.h
+
+$D/PSNADBoardEw.lib:
+	@pushd PSNAdBoard & \
+		echo ---------- & \
+		for /f "delims=" %d in ( 'cd' ) do @echo Making $@ in: %d & \
+		$(MAKE) /$(MAKEFLAGS) /f makefile.nt & \
+	popd
+
+
+# Clean-up rules
+clean:	clean\here \
+	clean\lib
+
+clean\here: PHONY
+	-del a.out core *.o *.obj *% *~
+
+clean\lib: PHONY
+	-@pushd PSNAdBoard & \
+		for /f "delims=" %d in ( 'cd' ) do @echo Cleaning in: %d & \
+		$(MAKE) /$(MAKEFLAGS) /f makefile.nt clean & \
+	popd
+
+clean_bin: \
+	clean_bin\here \
+	clean_bin\lib
+
+clean_bin\here: PHONY
+	-del $B\$(APP) $B\$(APP).exe
+
+clean_bin\lib: PHONY
+	-@pushd PSNAdBoard & \
+		for /f "delims=" %d in ( 'cd' ) do @echo Cleaning binaries in: %d & \
+		$(MAKE) /$(MAKEFLAGS) /f makefile.nt clean_bin & \
+	popd
+
+PHONY:

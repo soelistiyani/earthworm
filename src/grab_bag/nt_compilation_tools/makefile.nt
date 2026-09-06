@@ -1,0 +1,34 @@
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG = 1
+!ENDIF
+
+!include <Win32.Mak>
+
+CFLAGS  = $(cflags)    $(cdebug) $(cvarsmt)   $(GLOBALFLAGS)
+LDFLAGS = $(conlflags) $(ldebug) $(conlibsmt)
+
+B = $(EW_HOME)\$(EW_VERSION)\bin
+L = $(EW_HOME)\$(EW_VERSION)\lib
+
+APPS = \
+	$B\nt_clean_tree.exe \
+	$B\nt_comp.exe \
+	$B\nt_folder.exe \
+	$B\nt_folder2.exe \
+	$B\nt_make.exe \
+	$B\nt_make_subdirs.exe \
+	$B\nt_make_tree.exe
+
+$(APPS): $(@B).obj
+	$(link) /out:$@ $(LDFLAGS) $(@B).obj
+		
+
+# Clean-up rules
+clean: PHONY
+	-del a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	del $(APPS)
+
+PHONY:

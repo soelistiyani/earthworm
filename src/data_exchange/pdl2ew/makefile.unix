@@ -1,0 +1,34 @@
+LINUX_FLAGS    = -lm -ldl -lpthread
+SOLARIS_FLAGS  = -lm -ldl -lrt -lpthread
+SPECIFIC_FLAGS = $($(PLATFORM)_FLAGS)
+
+CFLAGS = $(GLOBALFLAGS)
+
+B = $(EW_HOME)/$(EW_VERSION)/bin
+L = $(EW_HOME)/$(EW_VERSION)/lib
+
+EW_LIBS = \
+	$L/dirops_ew.o \
+	$L/sleep_ew.o \
+	$L/swap.o \
+	-L$L -lew_mt
+
+all:	$B/ark2arc \
+	$B/pdl2ark
+
+$B/ark2arc: ark2arc.o
+	$(CC) -o $@ $(CFLAGS) ark2arc.o $L/sqlite3.o $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+$B/pdl2ark: pdl2ark.o
+	$(CC) -o $@ $(CFLAGS) pdl2ark.o $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-$(RM) $B/ark2arc $B/ark2arc.exe
+	-$(RM) $B/pdl2ark $B/pdl2ark.exe
+
+PHONY:

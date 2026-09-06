@@ -1,0 +1,41 @@
+LINUX_FLAGS    = -lm -lpthread
+SOLARIS_FLAGS  = -lm -lrt -lpthread
+SPECIFIC_FLAGS = $($(PLATFORM)_FLAGS)
+
+CFLAGS = $(GLOBALFLAGS)
+
+B = $(EW_HOME)/$(EW_VERSION)/bin
+
+APP = rmaxel
+
+OBJS = \
+	main.o \
+	azi.o \
+	basic.o \
+	bind.o \
+	confidence.o \
+	eigen.o \
+	gap.o \
+	getpar.o \
+	ll2utm.o \
+	mkreport.o \
+	pnpoly.o \
+	read_cntl.o \
+	read_obslist.o \
+	read_stnlist.o \
+	run_mle.o \
+	sample_stn.o \
+	trtable.o
+
+$B/$(APP): $(OBJS)
+	$(CC) -o $@ $(CFLAGS) $(OBJS) $(SPECIFIC_FLAGS)
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-$(RM) $B/$(APP) $B/$(APP).exe
+
+PHONY:

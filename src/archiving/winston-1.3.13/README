@@ -1,0 +1,19 @@
+Winston and Swarm are projects of the USGS Volcano Hazards Program
+
+They are provided here as a convenience for Earthworm users. Despite being in 
+the 'src' directory, the source is not provided here to avoid branching issues. 
+The active source can be found on github at 
+https://github.com/usgs/winston
+https://github.com/usgs/swarm
+
+Latest Swarm build:
+https://volcanoes.usgs.gov/software/swarm/download.shtml
+
+Latest Winston Build:
+http://volcanoes.usgs.gov/software/winston/
+
+Swarm requires a Java Runtime Environment (JRE) version 8 or above. 
+Winston requires JRE version 6 or above. 
+The Java JRE can be downloaded from the official Java website 
+http://www.java.com/en/download/ or the Oracle wite Java 
+http://www.oracle.com/technetwork/java/javase/downloads/index.html website. 

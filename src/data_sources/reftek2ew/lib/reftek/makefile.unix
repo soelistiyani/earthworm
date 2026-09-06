@@ -1,0 +1,31 @@
+LINUX_CFLAGS   = -O -I../..
+SOLARIS_CFLAGS = -O -I../.. -DSOLARIS
+SPECIFIC_CFLAGS = $($(PLATFORM)_CFLAGS)
+
+CFLAGS = $(GLOBALFLAGS) $(SPECIFIC_CFLAGS)
+
+OBJS = \
+	ad.o \
+	cd.o \
+	com.o \
+	dcomp.o \
+	ds.o \
+	dt.o \
+	eh.o \
+	et.o \
+	om.o \
+	sc.o \
+	sh.o \
+	steim.o \
+	reftek_string.o \
+	testlib.o type.o
+
+../libreftek.a: ../libreftek.a($(OBJS))
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+	-$(RM) ../libreftek.a ../libreftek.lib
+
+PHONY:

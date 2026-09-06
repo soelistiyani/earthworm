@@ -1,0 +1,32 @@
+LINUX_FLAGS    = -lm -lpthread
+SOLARIS_FLAGS  = -lm -lrt -lpthread
+SPECIFIC_FLAGS = $($(PLATFORM)_FLAGS)
+
+CFLAGS = $(GLOBALFLAGS)
+
+B = $(EW_HOME)/$(EW_VERSION)/bin
+L = $(EW_HOME)/$(EW_VERSION)/lib
+
+EW_LIBS = \
+	$L/pipe.o \
+	-L$L -lew_mt
+
+all:	$B/eqverify \
+	$B/arcfeeder
+
+$B/eqverify: eqverify.o
+	$(CC) -o $@ $(CFLAGS) eqverify.o $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+$B/arcfeeder: arcfeeder.o
+	$(CC) -o $@ $(CFLAGS) arcfeeder.o $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-$(RM) $B/eqverify  $B/eqverify.exe
+	-$(RM) $B/arcfeeder $B/arcfeeder.exe
+
+PHONY:

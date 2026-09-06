@@ -1,0 +1,160 @@
+.TH "NMXP_DATA_PROCESS" 3 "Wed Feb 10 2016" "Version 1.2.4" "libnmxp" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+NMXP_DATA_PROCESS \- Parameter structure for functions that process data\&.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <nmxp_data\&.h>\fP
+.SS "Public Attributes"
+
+.in +1c
+.ti -1c
+.RI "int32_t \fBkey\fP"
+.br
+.RI "\fIChannel Key\&. \fP"
+.ti -1c
+.RI "char \fBnetwork\fP [\fBNMXP_DATA_NETWORK_LENGTH\fP]"
+.br
+.RI "\fINetwork code\&. \fP"
+.ti -1c
+.RI "char \fBstation\fP [\fBNMXP_DATA_STATION_LENGTH\fP]"
+.br
+.RI "\fIStation code\&. \fP"
+.ti -1c
+.RI "char \fBchannel\fP [\fBNMXP_DATA_CHANNEL_LENGTH\fP]"
+.br
+.RI "\fIChannel code\&. \fP"
+.ti -1c
+.RI "char \fBlocation\fP [\fBNMXP_DATA_LOCATION_LENGTH\fP]"
+.br
+.RI "\fILocation code\&. \fP"
+.ti -1c
+.RI "int32_t \fBpacket_type\fP"
+.br
+.RI "\fIPacket type\&. \fP"
+.ti -1c
+.RI "int32_t \fBx0\fP"
+.br
+.RI "\fIFirst sample\&. It is significant only if x0n_significant != 0\&. \fP"
+.ti -1c
+.RI "int32_t \fBxn\fP"
+.br
+.RI "\fILast sample\&. It is significant only if x0n_significant != 0\&. \fP"
+.ti -1c
+.RI "int32_t \fBx0n_significant\fP"
+.br
+.RI "\fIDeclare if xn significant\&. \fP"
+.ti -1c
+.RI "int32_t \fBoldest_seq_no\fP"
+.br
+.RI "\fIOldest Sequence number\&. \fP"
+.ti -1c
+.RI "int32_t \fBseq_no\fP"
+.br
+.RI "\fISequence number\&. \fP"
+.ti -1c
+.RI "double \fBtime\fP"
+.br
+.RI "\fITime first sample\&. Epochs\&. \fP"
+.ti -1c
+.RI "int * \fBpDataPtr\fP"
+.br
+.RI "\fIArray of samples\&. \fP"
+.ti -1c
+.RI "int32_t \fBnSamp\fP"
+.br
+.RI "\fINumber or samples\&. \fP"
+.ti -1c
+.RI "int32_t \fBsampRate\fP"
+.br
+.RI "\fISample rate\&. \fP"
+.ti -1c
+.RI "int \fBtiming_quality\fP"
+.br
+.RI "\fITiming quality for functions send_raw*() \fP"
+.ti -1c
+.RI "char \fBquality_indicator\fP"
+.br
+.RI "\fIQuality indicator D, R, Q or M, new in Seed 2\&.4\&. \fP"
+.in -1c
+.SH "Detailed Description"
+.PP 
+Parameter structure for functions that process data\&. 
+.SH "Member Data Documentation"
+.PP 
+.SS "int32_t NMXP_DATA_PROCESS::key"
+
+.PP
+Channel Key\&. 
+.SS "char NMXP_DATA_PROCESS::network[\fBNMXP_DATA_NETWORK_LENGTH\fP]"
+
+.PP
+Network code\&. 
+.SS "char NMXP_DATA_PROCESS::station[\fBNMXP_DATA_STATION_LENGTH\fP]"
+
+.PP
+Station code\&. 
+.SS "char NMXP_DATA_PROCESS::channel[\fBNMXP_DATA_CHANNEL_LENGTH\fP]"
+
+.PP
+Channel code\&. 
+.SS "char NMXP_DATA_PROCESS::location[\fBNMXP_DATA_LOCATION_LENGTH\fP]"
+
+.PP
+Location code\&. 
+.SS "int32_t NMXP_DATA_PROCESS::packet_type"
+
+.PP
+Packet type\&. 
+.SS "int32_t NMXP_DATA_PROCESS::x0"
+
+.PP
+First sample\&. It is significant only if x0n_significant != 0\&. 
+.SS "int32_t NMXP_DATA_PROCESS::xn"
+
+.PP
+Last sample\&. It is significant only if x0n_significant != 0\&. 
+.SS "int32_t NMXP_DATA_PROCESS::x0n_significant"
+
+.PP
+Declare if xn significant\&. 
+.SS "int32_t NMXP_DATA_PROCESS::oldest_seq_no"
+
+.PP
+Oldest Sequence number\&. 
+.SS "int32_t NMXP_DATA_PROCESS::seq_no"
+
+.PP
+Sequence number\&. 
+.SS "double NMXP_DATA_PROCESS::time"
+
+.PP
+Time first sample\&. Epochs\&. 
+.SS "int* NMXP_DATA_PROCESS::pDataPtr"
+
+.PP
+Array of samples\&. 
+.SS "int32_t NMXP_DATA_PROCESS::nSamp"
+
+.PP
+Number or samples\&. 
+.SS "int32_t NMXP_DATA_PROCESS::sampRate"
+
+.PP
+Sample rate\&. 
+.SS "int NMXP_DATA_PROCESS::timing_quality"
+
+.PP
+Timing quality for functions send_raw*() 
+.SS "char NMXP_DATA_PROCESS::quality_indicator"
+
+.PP
+Quality indicator D, R, Q or M, new in Seed 2\&.4\&. 
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libnmxp from the source code\&.

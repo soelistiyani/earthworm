@@ -1,0 +1,118 @@
+# The single-threaded logit is no longer used; everything uses the multi-threaded logit_mt now
+
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG = 1
+!ENDIF
+
+!include <Win32.Mak>
+
+CFLAGS  = $(cflags)    $(cdebug) $(cvarsmt)   $(GLOBALFLAGS)
+
+L = $(EW_HOME)\$(EW_VERSION)\lib
+
+OBJS = \
+	ahputaway.obj \
+	base64.obj \
+	brent.obj \
+	butterworth.obj \
+	chron3.obj \
+	complex_math.obj \
+	convertInstResponse.obj \
+	cosmos0putaway.obj \
+	earthworm_defs.obj \
+	ew_spectra_io.obj \
+	ew_nevent_message.obj \
+	fft99.obj \
+	fft_prep.obj \
+	fleng.obj \
+	global_loc_rw.obj \
+	global_pick_rw.obj \
+	global_amp_rw.obj \
+	global_msg.obj \
+	gma.obj \
+	geo_to_km.obj \
+	geom.obj \
+	get_ip_format_string.obj \
+	getutil.obj \
+	glevt_2_ewevent.obj \
+	gseputaway.obj \
+	k2evt2ew.obj \
+	kom.obj \
+	ioc_filter.obj \
+	logit_mt.obj \
+	lockfile.obj \
+	make_triglist.obj \
+	mem_circ_queue.obj \
+	mnbrak.obj \
+	mseedputaway.obj \
+	neic2scn.obj \
+	parse_ip_address.obj \
+	parse_trig.obj \
+	parse_usnsn.obj \
+	priority_queue.obj \
+	psn4putaway.obj \
+	putaway.obj \
+	rayloc_message_rw.obj \
+	rdpickcoda.obj \
+	read_arc.obj \
+	residue.obj \
+	rw_coda_aav.obj \
+	rw_mag.obj \
+	rw_strongmotion.obj \
+	rw_strongmotionII.obj \
+	sacputaway.obj \
+	seiputaway.obj \
+	seiutils.obj \
+	site.obj \
+	socket_ew_common.obj \
+	sqlite3.obj \
+	startstop_lib.obj \
+	sudsputaway.obj \
+	swap.obj \
+	tankputaway.obj \
+	tlay.obj \
+	transfer.obj \
+	transferFunction.obj \
+	xfrm.obj \
+	trheadconv.obj \
+	watchdog_client.obj \
+	wfdiscputaway.obj \
+	ws_clientII.obj \
+	ws_clientIIx.obj \
+	ws_clientII_no_location.obj \
+	ws2ts.obj \
+	nordic.obj
+#	logit.obj \
+#	wave_client.obj
+
+$L\libew_util.lib: $(OBJS) libmseed signing
+	lib /nologo /out:$@ *.obj
+	copy *.obj $L
+
+libmseed \
+signing: PHONY
+	@pushd $@ & \
+		echo ---------- & \
+		for /f "delims=" %d in ( 'cd' ) do @echo Making $@ in: %d & \
+		$(MAKE) /$(MAKEFLAGS) /f makefile.nt & \
+	popd
+	
+
+# Clean-up rules
+clean:	clean\here \
+	clean\libmseed \
+	clean\signing
+
+clean\here: PHONY
+	-del core *.o *.obj *% *~
+	-del $Llibew_util.a $Llibew_util.lib
+
+clean\libmseed \
+clean\signing: PHONY
+	-@pushd $(@F) & \
+		for /f "delims=" %d in ( 'cd' ) do @echo Cleaning in: %d & \
+		$(MAKE) /$(MAKEFLAGS) /f makefile.nt clean & \
+	popd
+
+PHONY:

@@ -1,0 +1,27 @@
+LINUX_CFLAGS    = -O -I../..
+SOLARIS_CFLAGS  = -O -I../.. -DSOLARIS
+SPECIFIC_CFLAGS = $($(PLATFORM)_CFLAGS)
+
+CFLAGS = $(GLOBALFLAGS) $(SPECIFIC_CFLAGS)
+
+OBJS = \
+	bcd2long.o \
+	dump.o \
+	find.o \
+	getline.o \
+	mstime.o \
+	parse.o \
+	string.o \
+	swap.o \
+	timefunc.o \
+	timer.o
+
+../libutil.a: ../libutil.a($(OBJS))
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+	-$(RM) ../libutil.a ../libutil.lib
+
+PHONY:

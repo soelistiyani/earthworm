@@ -1,0 +1,37 @@
+LINUX_FLAGS    = -lpthread
+SOLARIS_FLAGS  = -lrt -lpthread
+SPECIFIC_FLAGS = $($(PLATFORM)_FLAGS)
+
+CFLAGS = $(GLOBALFLAGS)
+
+B = $(EW_HOME)/$(EW_VERSION)/bin
+L = $(EW_HOME)/$(EW_VERSION)/lib
+
+APP1 = ring2file
+APP2 = file2ring
+
+OBJ1 = $(APP1).o
+OBJ2 = $(APP2).o
+
+EW_LIBS = -L$L -lew_mt
+
+# all: ring2file file2ring reader printRecords tabulatePicks
+all:	$B/$(APP1) \
+	$B/$(APP2)
+
+$B/$(APP1): $(OBJ1)
+	$(CC) -o $@ $(CFLAGS) $(OBJ1) $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+$B/$(APP2): $(OBJ2)
+	$(CC) -o $@ $(CFLAGS) $(OBJ2) $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-$(RM) $B/$(APP1) $B/$(APP1).exe
+	-$(RM) $B/$(APP2) $B/$(APP2).exe
+
+PHONY:

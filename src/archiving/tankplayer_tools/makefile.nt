@@ -1,0 +1,107 @@
+!IF "$(EW_DEBUG)" == "1"
+!ELSE
+NODEBUG = 1
+!ENDIF
+
+!include <Win32.Mak>
+
+CFLAGS  = $(cflags)    $(cdebug) $(cvarsmt)   $(GLOBALFLAGS)
+LDFLAGS = $(conlflags) $(ldebug) $(conlibsmt)
+
+B = $(EW_HOME)\$(EW_VERSION)\bin
+L = $(EW_HOME)\$(EW_VERSION)\lib
+
+APP = remux_tbuf
+O = $(APP).obj remux_code.obj
+
+APP2 = ring2tank
+O2 = $(APP2).obj
+
+APP3 = smb2tb
+O3 = $(APP3).obj hashtable.obj
+
+APP4 = ms2tank
+O4 = $(APP4).obj mseed2tank.obj
+
+APP5 = tr2dump
+O5 = $(APP5).obj
+
+APP6 = dc2tank
+O6 = $(APP6).obj mseed2tank.obj remux_code.obj
+
+APP7 = tanksniff
+O7 = $(APP7).obj
+
+APP8 = tankcut
+O8 = $(APP8).obj remux_code.obj
+
+APP9 = sac2tb
+O9 = $(APP9).obj
+
+APP10 = wsvtank2tb
+O10 = $(APP10).obj
+
+EW_LIBS = \
+	/LIBPATH:$L \
+	swap.obj \
+	libew_mt.lib
+
+all:	$B\$(APP).exe \
+	$B\$(APP2).exe \
+	$B\$(APP3).exe \
+	$B\$(APP4).exe \
+	$B\$(APP5).exe \
+	$B\$(APP7).exe \
+	$B\$(APP8).exe \
+	$B\$(APP9).exe \
+	$B\$(APP10).exe
+
+$B\$(APP).exe: $O
+	$(link) /out:$@ $(LDFLAGS) $O $(EW_LIBS)
+
+$B\$(APP2).exe: $(O2)
+	$(link) /out:$@ $(LDFLAGS) $(O2) /LIBPATH:$L swap.obj libew_mt.lib
+
+$B\$(APP3).exe: $(O3)
+	$(link) /out:$@ $(LDFLAGS) $(O3) /LIBPATH:$L libew_mt.lib
+
+$B\$(APP4).exe: $(O4)
+	$(link) /out:$@ $(LDFLAGS) $(O4) /LIBPATH:$L libmseed.lib
+
+$B\$(APP5).exe: $(O5)
+	$(link) /out:$@ $(LDFLAGS) $(O5) $(EW_LIBS)
+
+$B\$(APP6).exe: $(O6)
+	$(link) /out:$@ $(LDFLAGS) $(O6) /LIBPATH:$L dirops_ew.obj libmseed.lib $(EW_LIBS)
+
+$B\$(APP7).exe: $(O7)
+	$(link) /out:$@ $(LDFLAGS) $(O7) $(EW_LIBS)
+
+$B\$(APP8).exe: $(O8)
+	$(link) /out:$@ $(LDFLAGS) $(O8) $(EW_LIBS)
+
+$B\$(APP9).exe: $(O9)
+	$(link) /out:$@ $(LDFLAGS) $(O9) $(EW_LIBS)
+
+$B\$(APP10).exe: $(O10)
+	$(link) /out:$@ $(LDFLAGS) $(O10) $(EW_LIBS)
+
+
+# Clean-up rules
+clean: PHONY
+	-del a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-del $B\dc2tank      $B\dc2tank.exe
+	-del $B\ms2tank      $B\ms2tank.exe
+	-del $B\ms2tb        $B\ms2tb.exe
+	-del $B\remux_tbuf   $B\remux_tbuf.exe
+	-del $B\ring2tank    $B\ring2tank.exe
+	-del $B\sac2tb       $B\sac2tb.exe
+	-del $B\smb2tb       $B\smb2tb.exe
+	-del $B\tankcut      $B\tankcut.exe
+	-del $B\tanksniff    $B\tanksniff.exe
+	-del $B\tr2dump      $B\tr2dump.exe
+	-del $B\wsvtank2tb   $B\wsvtank2tb.exe
+
+PHONY:

@@ -1,0 +1,88 @@
+LINUX_FLAGS    = -lpthread
+SOLARIS_FLAGS  = -lrt -lpthread
+SPECIFIC_FLAGS = $($(PLATFORM)_FLAGS)
+
+CFLAGS = $(GLOBALFLAGS)
+
+B = $(EW_HOME)/$(EW_VERSION)/bin
+L = $(EW_HOME)/$(EW_VERSION)/lib
+
+APP = rayloc_ew
+
+OBJS = \
+	rayloc_ew_main.o \
+	rayloc_ew_config.o
+
+F_SRCS = \
+	hypo.f \
+	distaz.f \
+	ellip.f \
+	input.f \
+	libsun.f \
+	io_util.f \
+	libtau.f \
+	output.f \
+	robust_util.f
+
+F_STUB = \
+	libray_wrapper.f90 \
+	librayloc1.f
+
+EW_LIBS = \
+	$L/earthworm_defs.o \
+	$L/global_loc_rw.o \
+	$L/global_msg.o \
+	$L/rayloc_message_rw.o \
+	$L/swap.o \
+	-L$L -lew_mt
+
+F_MAIN      = raylocator.f
+C_MAIN1_SRC = rayloc_test1.c
+C_MAIN1     = $(C_MAIN1_SRC:%.c=%.o)
+C_MAIN2_SRC = rayloc_test2.c
+C_MAIN2     = $(C_MAIN2_SRC:%.c=%.o)
+C_SRCS = \
+	rayloc_stations.c \
+	rayloc_unused_phases.c \
+	rayloc1.c
+C_OBJS = $(C_SRCS:%.c=%.o)
+
+PROGS =	\
+	$B/rayloc_ew \
+	# $B/rayloc_test1 \
+	# $B/rayloc_test2 \
+	# $B/rayloc_test3
+
+########################################################################
+
+all: $(PROGS)
+
+$B/$(APP): $(OBJS) $(F_SRCS) $(F_STUB) $(C_OBJS)
+	$(FC) -o $@ $(FC_MAIN_IS_C) $(FFLAGS) $(OBJS) $(F_SRCS) \
+		$(F_STUB) $(C_OBJS) $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+$B/rayloc_test1: $(F_MAIN) $(F_SRCS)
+	$(FC) -o $@ $(FFLAGS) $(F_MAIN) $(F_SRCS)
+
+$B/rayloc_test2: $(C_MAIN1) $(F_SRCS) $(F_STUB) $(C_OBJS)
+	$(FC) -o $@ $(FFLAGS) $(C_MAIN1) $(F_SRCS) $(F_STUB) $(C_OBJS) -L$L -lew_mt
+
+$B/rayloc_test3: $(C_MAIN2) $(F_SRCS) $(F_STUB) $(C_OBJS)
+	$(FC) -o $@ $(FFLAGS) $(C_MAIN2) $(F_SRCS) $(F_STUB) $(C_OBJS) -L$L -lew_mt
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-$(RM) $B/$(APP)       $B/$(APP).exe
+	-$(RM) $B/rayloc_test1 $B/rayloc_test1.exe
+	-$(RM) $B/rayloc_test2 $B/rayloc_test2.exe
+	-$(RM) $B/rayloc_test3 $B/rayloc_test3.exe
+	-$(RM) -r $B/$(APP).dSYM
+	-$(RM) -r $B/rayloc_test1.dSYM
+	-$(RM) -r $B/rayloc_test2.dSYM
+	-$(RM) -r $B/rayloc_test3.dSYM
+
+PHONY:

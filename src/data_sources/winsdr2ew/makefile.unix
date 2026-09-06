@@ -1,0 +1,57 @@
+LINUX_FLAGS    = -lm -lpthread
+SOLARIS_FLAGS  = -lm -lnsl -lsocket -lrt -lpthread
+SPECIFIC_FLAGS = $($(PLATFORM)_FLAGS)
+
+CFLAGS = $(GLOBALFLAGS) -Imseed
+
+B = $(EW_HOME)/$(EW_VERSION)/bin
+L = $(EW_HOME)/$(EW_VERSION)/lib
+
+APP = ws2ew
+
+OBJS = \
+	Ws2Ew.o \
+	Ws2EwUtils.o \
+	getconfig.o
+
+LIB_PSN = -Lmseed -lpsnms
+
+EW_LIBS = \
+	$L/getutil.o \
+	$L/kom.o \
+	$L/logit_mt.o \
+	$L/mem_circ_queue.o \
+	$L/sema_ew.o \
+	$L/sleep_ew.o \
+	$L/socket_ew.o \
+	$L/socket_ew_common.o \
+	$L/threads_ew.o \
+	$L/time_ew.o \
+	$L/transport.o
+
+$B/$(APP): $(OBJS) mseed/libpsnms.a
+	$(CC) -o $@ $(CFLAGS) $(OBJS) $(LIB_PSN) $(EW_LIBS) $(SPECIFIC_FLAGS)
+
+mseed/libpsnms.a:
+	@cd mseed && \
+		echo ---------- ; \
+		echo Making $@ in: `pwd` ; \
+		$(MAKE) -f makefile.unix
+
+
+# Clean-up rules
+clean:	clean/here \
+	clean/mseed
+
+clean/here: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+
+clean/mseed: PHONY
+	-@cd mseed && \
+		echo Cleaning in: `pwd` ; \
+		$(MAKE) -f makefile.unix clean
+
+clean_bin: PHONY
+	-$(RM) $B/$(APP) $B/$(APP).exe
+
+PHONY:

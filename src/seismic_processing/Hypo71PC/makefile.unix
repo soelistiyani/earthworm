@@ -1,0 +1,29 @@
+B = $(EW_HOME)/$(EW_VERSION)/bin
+
+APP = Hypo71PC
+
+SRCS = \
+	main.f \
+	hypo1m2.f \
+	hypo2.f \
+	hypo3.f \
+	hypo4.f \
+	single.f \
+	ytrv.f \
+	input1.f \
+	timz3.f \
+	geo_sp.f
+
+$B/$(APP): $(SRCS)
+	$(FC) -o $@ $(FFLAGS) $(SRCS)
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-$(RM) $B/$(APP) $B/$(APP).exe
+	-$(RM) -r $B/$(APP).dSYM
+
+PHONY:

@@ -1,0 +1,29 @@
+CFLAGS = $(GLOBALFLAGS) -I..
+
+B = $(EW_HOME)/$(EW_VERSION)/bin
+L = $(EW_HOME)/$(EW_VERSION)/lib
+
+all:	$B/inspect_tank \
+	$B/read_index \
+	$B/read_struct
+
+$B/inspect_tank: inspect_tank.o
+	$(CC) -o $@ $(CFLAGS) inspect_tank.o
+
+$B/read_index: read_index.o
+	$(CC) -o $@ $(CFLAGS) read_index.o
+
+$B/read_struct: read_struct.o
+	$(CC) -o $@ $(CFLAGS) read_struct.o
+
+
+# Clean-up rules
+clean: PHONY
+	-$(RM) a.out core *.o *.obj *% *~
+
+clean_bin: PHONY
+	-$(RM) $B/inspect_tank $B/inspect_tank.exe
+	-$(RM) $B/read_index   $B/read_index.exe
+	-$(RM) $B/read_struct  $B/read_struct.exe
+
+PHONY:
