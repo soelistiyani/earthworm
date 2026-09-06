@@ -29,7 +29,7 @@
 #include "dsarchive.h"
 
 #define PACKAGE "ewmseedarchiver"
-#define PROGRAM_VERSION "0.3.1 2018-06-26"
+#define PROGRAM_VERSION "0.3.2 2026-09-06"
 
 static int archiverecord (char *record, int reclen);
 static thr_ret MessageStacker (void *); /* Read messages and add to queue */
@@ -83,6 +83,7 @@ static int     LogSwitch;           /* 0 if no logfile should be written */
 static int     HeartBeatInt;        /* seconds between heartbeats        */
 static long    MaxMsgSize;          /* max size for input/output msgs    */
 static int     QueueSize;           /* max messages in output circular buffer */
+static int     FlushInterval = 3600;/* seconds between archive file flushes   */
 
 /* Things to look up in the earthworm.h tables with getutil.c functions */
 static long          RingNameKey;   /* key of transport ring for input    */
@@ -113,6 +114,7 @@ main ( int argc, char **argv )
   int        ret;
   long       msgSize;
   int        count;
+  time_t     lastFlush;
   
   /* Check command line arguments */
   Argv0 = argv[0];
@@ -203,6 +205,7 @@ main ( int argc, char **argv )
   /* One heartbeat to announce ourselves to statmgr */
   logstatus( TypeHeartBeat, 0, "" );
   time(&MyLastBeat);
+  lastFlush = MyLastBeat;
   
   /* Start the message stacking thread if it isn't already running. */
   if ( MessageStackerStatus != MSGSTK_ALIVE )
@@ -229,6 +232,28 @@ main ( int argc, char **argv )
 	{
 	  logstatus ( TypeHeartBeat, 0, "" );
 	  MyLastBeat = now;
+	}
+
+      /* Periodically synchronize open archive files with the file system. */
+      if ( FlushInterval > 0 &&
+           difftime(now,lastFlush) >= (double)FlushInterval )
+	{
+	  Archive *arch = archiveroot;
+	  int flushError = 0;
+
+	  while ( arch )
+	    {
+	      if ( ds_flush (&arch->datastream, verbose-1) != 0 )
+	        flushError = 1;
+	      arch = arch->next;
+	    }
+
+	  if ( flushError )
+	    logit ("et", "Error synchronizing archive files\n");
+	  else if ( verbose )
+	    logit ("t", "Archive files synchronized\n");
+
+	  lastFlush = now;
 	}
       
       /* Process up to 10 messages, then let outer loop have a pass */
@@ -626,6 +651,16 @@ config ( char *configfile )
 	  else if ( k_its("Verbosity") )
 	    {
 	      verbose = k_long();
+            }
+	  else if ( k_its("FlushInterval") )
+	    {
+	      FlushInterval = k_int();
+	      if ( FlushInterval < 0 )
+	        {
+	          logit ("e", "%s: <FlushInterval> must be zero or greater; exiting!\n",
+	                 Argv0);
+	          exit(-1);
+	        }
             }
 	  
 	  /* Pass it off to the filter's config processor */

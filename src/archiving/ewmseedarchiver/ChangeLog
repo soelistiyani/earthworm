@@ -1,3 +1,8 @@
+2026.249: 0.3.2
+	- Add configurable periodic archive synchronization (FlushInterval,
+	  default 3600 seconds) so file data and size metadata are committed
+	  without waiting for a day/stream change or shutdown.
+
 2014.234: 0.2
 	- Fix file creation mode on Windows by opening in "binary" mode.
 

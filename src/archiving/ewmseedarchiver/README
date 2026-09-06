@@ -5,3 +5,8 @@ Read MSEED messages from an Earthworm transport ring and write the
 miniSEED records to the file system in flexible file layout.
 
 See the ewmseedarchiver.d file for further description of options.
+
+Open archive files are synchronized with the file system every hour by
+default.  Configure this with "FlushInterval" (seconds); set it to 0 to
+disable periodic synchronization.  Include the defining flag "%H" in an
+Archive path when separate hourly files are desired.

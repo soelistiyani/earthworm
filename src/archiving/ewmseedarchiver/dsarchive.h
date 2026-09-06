@@ -34,5 +34,6 @@ extern int ds_maxopenfiles;
 
 extern int ds_streamproc (DataStream *datastream, MSRecord *msr,
                           long suffix, int verbose);
+extern int ds_flush (DataStream *datastream, int verbose);
 
 #endif /* DSARCHIVE_H */

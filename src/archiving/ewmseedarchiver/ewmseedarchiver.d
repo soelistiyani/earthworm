@@ -24,6 +24,8 @@
 # Optional parameters
 #
 #Verbosity  0                 # set verbosity, useful for diagnostics
+#FlushInterval 3600           # sync open archive files every N seconds;
+#                             # default 3600 (1 hour), 0 disables periodic sync
 
 # List of station/channel/network/loc codes to process.
 #--------------------------------------------------------
@@ -52,6 +54,8 @@ Send_scnl * * * *
 #Archive /data/archive/%n/%s/%Y.%j.%n.%s.%l.%c.mseed
 # Windows example (may use backslashes or forward slashes):
 #Archive D:\data\archive\%n\%s\%Y.%j.%n.%s.%l.%c.mseed
+# One file per hour (note the defining %H flag):
+#Archive D:\data\archive\%n\%s\%Y.%j.%H.%n.%s.%l.%c.mseed
 #
 
 

@@ -414,6 +414,54 @@ ds_streamproc (DataStream *datastream, MSRecord *msr, long suffix, int verbose)
 
 
 /***************************************************************************
+ * ds_flush:
+ *
+ * Synchronize all open files for a DataStream with the file system.  This
+ * makes archive data and file-size metadata visible without waiting for a
+ * stream change or module shutdown.
+ *
+ * Returns 0 on success, -1 if one or more files could not be synchronized.
+ ***************************************************************************/
+extern int
+ds_flush (DataStream *datastream, int verbose)
+{
+  DataStreamGroup *group;
+  int retval = 0;
+
+  if ( ! datastream )
+    return -1;
+
+  group = datastream->grouproot;
+
+  while ( group != NULL )
+    {
+      if ( group->filed > 0 )
+        {
+#ifdef _WINNT
+          if ( _commit (group->filed) != 0 )
+#else
+          if ( fsync (group->filed) != 0 )
+#endif
+            {
+              fprintf (stderr, "ds_flush(), synchronizing data stream file: %s\n",
+                       strerror (errno));
+              retval = -1;
+            }
+          else if ( verbose >= 2 )
+            {
+              fprintf (stderr, "Synchronized data stream with key %s\n",
+                       group->defkey);
+            }
+        }
+
+      group = group->next;
+    }
+
+  return retval;
+}  /* End of ds_flush() */
+
+
+/***************************************************************************
  * ds_getstream:
  *
  * Find the DataStreamGroup entry that matches the definition key, if
