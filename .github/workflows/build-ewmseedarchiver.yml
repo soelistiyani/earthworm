@@ -1,0 +1,59 @@
+name: Build ewmseedarchiver for Windows
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "src/**"
+      - ".github/workflows/build-ewmseedarchiver.yml"
+
+jobs:
+  build:
+    runs-on: windows-2022
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Build ewmseedarchiver
+        shell: cmd
+        run: |
+          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x86
+
+          cl
+          nmake /?
+
+          call environment\ew_nt.cmd
+
+          cd src\archiving\ewmseedarchiver
+          nmake /f makefile.nt clean
+          nmake /f makefile.nt
+
+      - name: Locate executable
+        shell: powershell
+        run: |
+          Get-ChildItem -Path . -Recurse `
+            -Filter ewmseedarchiver.exe |
+            Select-Object FullName, Length, LastWriteTime
+
+      - name: Collect executable
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Force artifact
+
+          $exe = Get-ChildItem -Path . -Recurse `
+            -Filter ewmseedarchiver.exe |
+            Select-Object -First 1
+
+          if (-not $exe) {
+              throw "ewmseedarchiver.exe tidak ditemukan"
+          }
+
+          Copy-Item $exe.FullName `
+            artifact\ewmseedarchiver.exe
+
+      - name: Upload executable
+        uses: actions/upload-artifact@v4
+        with:
+          name: ewmseedarchiver-windows-x86
+          path: artifact/ewmseedarchiver.exe
